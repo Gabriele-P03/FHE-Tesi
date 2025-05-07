@@ -22,9 +22,14 @@ class Producer:
         logger.info("Producer Initialized")
         return instance
 
-    def execute(cmd: str):
+    def execute(self, cmd: str, socket) -> Packet:
         splitted_cmd = cmd.split(" ", 2)
         cmd_name = splitted_cmd[0]    #Command Name
-        op = operations.getOperationByName(cmd_name).__copy__()
-        if len(splitted_cmd) > 1:
-            op.operation.storeParameters(splitted_cmd[1]) #Store parameters
+        op_enum = operations.getOperationByName(cmd_name)
+        op = op_enum.operation.__copy__()
+        op.storeParameters(splitted_cmd) #Store parameters
+        packet = Packet(_data=op.data(), _op=op_enum.value)
+        bs = bytes(packet.json(), encoding='utf8')
+        socket.send(bs)
+        
+

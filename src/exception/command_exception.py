@@ -1,5 +1,6 @@
-class CommandException(BaseException):
+class CommandException(Exception):
 
-    def __new__(cls, msg: str):
-        inst = super().__new__(msg)
-        return inst
+    def __init__(self, msg):
+        super().__init__(msg)
+
+        

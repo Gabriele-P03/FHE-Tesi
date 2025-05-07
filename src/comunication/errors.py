@@ -1,12 +1,16 @@
 from enum import Enum
+import json
 
 class ERRORS(Enum):
+
+    index: int
 
     OK = 0,
     INVALID_OPERATION = 1
     DATASET_NOTFOUND = 2
     DATASET_ALREADY_LOADED = 3
     NO_DATASET_LOADED = 4
+
 
 def getMessageErrorByIndex(er: ERRORS):
     match er:

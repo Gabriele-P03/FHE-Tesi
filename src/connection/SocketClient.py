@@ -40,16 +40,9 @@ class SocketClient:
     def loop(self):
         flag = True
         while flag:
-            cmd = input('Enter a new command')
-            self.__producer.execute(cmd)
+            cmd = input('Enter a new command: ')
+            self.__producer.execute(cmd, self.__socket)
                 
-        self.close()
-
-    def close(self):
-        self.__producer.close()
-
-    def __send(self, packet: Packet):
-        self.__socket.sendall(packet.json())
 
 
 

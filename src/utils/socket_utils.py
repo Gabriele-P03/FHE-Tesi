@@ -4,11 +4,13 @@ from parameters.parameters import INSTANCE
 
 def recv(__socket):
     size = 0
-    data = [b'']
+    data = b''
     bSize = INSTANCE.buffer_size.value
     pSize = INSTANCE.packet_size.value
-    while b'\n' not in data[-1] and size < bSize:
+    while True:
+        if b'\n' in data or size > bSize:
+            break
         tmp = __socket.recv(pSize)
-        data.append(tmp)
+        data += tmp
         size += len(tmp)
     return data, size

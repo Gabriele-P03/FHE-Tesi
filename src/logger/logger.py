@@ -53,4 +53,4 @@ def dbg(msg: str):
     log(LOGTYPE.DBG, msg)
 
 def throw(exc: Exception):
-    err(exc)
+    err(exc.__str__())

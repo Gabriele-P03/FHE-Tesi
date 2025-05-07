@@ -5,6 +5,7 @@ In this enum file will be declared all operations type available
 
 import re 
 import sys
+import json
 
 sys.path.append('../exception')
 from exception import command_exception
@@ -20,8 +21,10 @@ class Parameter(Generic[T]):
     __required: bool
 
     __value: T
+    __valorized: bool
 
     __cast_function = None
+
 
     def __new__(cls, *argv, **kwds):
         inst = object.__new__(cls)
@@ -31,14 +34,30 @@ class Parameter(Generic[T]):
         self.__key = _key
         self.__required = _required
         self.__cast_function = _cast_function
-
+        self.__valorized = False
 
     def valorize(self, value: str):
         self.__value = self.__cast_function(value)
+        self.__valorized = True
 
     @property
     def value(self):
         return self.__value    
+    
+    @property
+    def valorized(self) -> bool:
+        return self.__valorized
+    
+    @property
+    def required(self) -> bool:
+        return self.__required
+    
+    @property
+    def key(self) -> str:
+        return self.__key
+    
+    def data(self) -> str:
+        return self.key + "=" + self.value
     
 import copy    
 
@@ -56,6 +75,10 @@ class Operation:
     def __init__(self, _name: str, _parameters: List[Parameter] = []):
         self.__name = _name
         self.__parameters = _parameters
+
+    @property
+    def name(self):
+        return self.__name    
     
     def __copy__(self):
         if not self.__model:
@@ -73,19 +96,43 @@ class Operation:
         copied.__model = False
         return copied
     
-    def storeParameters(self, raw_pars: str): 
+    def storeParameters(self, raw_pars: list[str]): 
         if self.__model:
             raise command_exception.CommandException(self.__name + " is actually a model command")
         
-        splitted_parameters = re.sub(' +', ' ', raw_pars.strip).split(' ')  #Remove multiple spaces and split the result string
-        for par in splitted_parameters:
-            spli_par = par.split('=')
-            #Check if parameter's key exists
-            for cr in self.__parameters:
-                if cr.__key == spli_par:
-                    cr.valorize(spli_par[1])
-                    break
-            raise command_exception.CommandException("Parameter " + spli_par[0] + " is not owned by " + self.__name)
+        if len(raw_pars) > 1:
+
+            if len(raw_pars) != 2:
+                raise command_exception(raw_pars + " is not a valid command")
+
+            splitted_parameters = re.sub(' +', ' ', raw_pars[1].strip()).split(' ')  #Remove multiple spaces and split the result string
+            for par in splitted_parameters:
+                spli_par = par.split('=')
+                #Check if parameter's key exists
+                flagFound = False
+                for cr in self.__parameters:
+                    if cr.key == spli_par[0]:
+                        cr.valorize(spli_par[1])
+                        flagFound = True
+                        break
+                if not flagFound:
+                    raise command_exception.CommandException("Parameter " + spli_par[0] + " is not owned by " + self.__name)
+        self.__checkRequiredUnvalorizedParams()
+
+    def __checkRequiredUnvalorizedParams(self):
+        for par in self.__parameters:
+            if par.required and not par.valorized:
+                raise command_exception.CommandException("Parameter " + par.key + " is required")
+
+    def data(self) -> str:
+        buffer = "["
+        for i in range(0, len(self.__parameters)):
+            par = self.__parameters[i]
+            buffer += '{' + par.data() + '}'
+            if i < len(self.__parameters)-1:
+                buffer += ','
+        buffer += "]"
+        return buffer
 
 class OPERATIONS(Enum):
 
@@ -108,17 +155,19 @@ class OPERATIONS(Enum):
 
     LOAD = 1, Operation(
                     'load', 
-                    {
+                    [
                         Parameter[str]('uri', True, str)
-                    }
+                    ]
             )
     
-    PING = 2, Operation(
+    PING = 3, Operation(
                     'ping',
-                    {}
-            ) 
+                    []
+            )
+
 
 def getOperationByName(name: str) -> OPERATIONS:
     for cr in list(OPERATIONS):
-        if cr.__operation.__name == name:
+        if cr.operation.name == name:
             return cr
+    raise command_exception.CommandException("Command " + name + " does not exists")

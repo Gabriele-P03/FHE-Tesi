@@ -29,19 +29,19 @@ class SocketServer(socketserver.BaseRequestHandler):
     __dispatcher: Dispatcher = None
 
     def handle(self):
-        logger.dbg('Handling...')
-        if not self.__connected:
-            logger.info("Connection enstabilished with " + self.client_address[0])
+        logger.info("Connection enstabilished with " + self.client_address[0])
+        self.fhe = FHE()
+        self.__pk = pk_exchange.exchange(self.request, self.fhe.pk)
+        self.__connected = True
+        self.__dispatcher = Dispatcher()
 
-            self.fhe = FHE()
-            self.__pk = pk_exchange.exchange(self.request, self.fhe.pk)
-            self.__connected = True
-            self.__dispatcher = Dispatcher()
-        else:
-            logger.info("Receiving...")
-            data, size = socket_utils.recv(self.request)
-            json_string = str(data)
-            self.__dispatcher.dispatch(json_string)
+        self.loop()
+
+    def loop(self):
+        logger.info("Receiving...")
+        data, size = socket_utils.recv(self.request)
+        json_string = str(data, encoding='utf8')
+        self.__dispatcher.dispatch(json_string, self.fhe)
 
         
 def getIstance() -> socketserver.TCPServer:
