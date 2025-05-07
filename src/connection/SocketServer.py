@@ -9,7 +9,11 @@ from fhe.fhe import FHE
 
 sys.path.append('../utils')
 from utils import pk_exchange
+from utils import socket_utils
 from util.public_key import PublicKey
+
+sys.path.append('../comunication')
+from comunication.dispatcher.dispatcher import Dispatcher
 
 port = INSTANCE.port.value
 host = 'localhost'
@@ -20,13 +24,24 @@ class SocketServer(socketserver.BaseRequestHandler):
 
     __pk: PublicKey = None
 
+    __connected = False
+
+    __dispatcher: Dispatcher = None
+
     def handle(self):
+        logger.dbg('Handling...')
+        if not self.__connected:
+            logger.info("Connection enstabilished with " + self.client_address[0])
 
-        logger.info("Connection enstabilished with " + self.client_address[0])
-
-        self.fhe = FHE()
-        self.__pk = pk_exchange.exchange(self.request, self.fhe.pk)
-        
+            self.fhe = FHE()
+            self.__pk = pk_exchange.exchange(self.request, self.fhe.pk)
+            self.__connected = True
+            self.__dispatcher = Dispatcher()
+        else:
+            logger.info("Receiving...")
+            data, size = socket_utils.recv(self.request)
+            json_string = str(data)
+            self.__dispatcher.dispatch(json_string)
 
         
 def getIstance() -> socketserver.TCPServer:

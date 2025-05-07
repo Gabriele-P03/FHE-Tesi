@@ -13,6 +13,9 @@ from util.public_key import PublicKey
 sys.path.append('../utils')
 from utils import pk_exchange
 
+sys.path.append('../comunication')
+from comunication.producer.producer import Producer, Packet 
+
 class SocketClient:
 
     __socket = None
@@ -20,6 +23,8 @@ class SocketClient:
     __pk : PublicKey = None
 
     __fhe: FHE = None
+
+    __producer: Producer = None
 
     def __init__(self):
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -29,6 +34,22 @@ class SocketClient:
 
         self.__fhe = FHE()
         self.__pk = pk_exchange.exchange(self.__socket, self.__fhe.pk)
+
+        self.__producer = Producer()
+    
+    def loop(self):
+        flag = True
+        while flag:
+            cmd = input('Enter a new command')
+            self.__producer.execute(cmd)
+                
+        self.close()
+
+    def close(self):
+        self.__producer.close()
+
+    def __send(self, packet: Packet):
+        self.__socket.sendall(packet.json())
 
 
 

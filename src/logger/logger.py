@@ -51,3 +51,6 @@ def dbg(msg: str):
     if DEBUG:
         msg = "!!! DEBUGGER IS NOT ATTACHED !!!"    
     log(LOGTYPE.DBG, msg)
+
+def throw(exc: Exception):
+    err(exc)
