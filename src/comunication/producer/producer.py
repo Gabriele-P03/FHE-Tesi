@@ -31,5 +31,6 @@ class Producer:
         packet = Packet(_data=op.data(), _op=op_enum.value)
         bs = bytes(packet.json(), encoding='utf8')
         socket.send(bs)
+        return packet
         
 

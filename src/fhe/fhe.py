@@ -48,6 +48,8 @@ class FHE:
         big_modulus = 1 << 1200
         scaling_factor = 1 << 30
 
+        logger.info("FHE Parameters -> Poly Degree: "+str(poly_degree) + " Cipher Modulus: " + str(ciph_modulus) + " Big Modulus: " + str(big_modulus) + " Scaling Factor: " + str(scaling_factor) )
+
         self.__parameters = CKKSParameters(
             poly_degree=poly_degree,
             ciph_modulus=ciph_modulus,
@@ -76,6 +78,13 @@ class FHE:
         
         return self.__keyGenerator.public_key 
     
+    @property
+    def encryptor(self):
+        return self.__encryptor
+    
+    @property
+    def encoder(self):
+        return self.__encoder
 
 
 

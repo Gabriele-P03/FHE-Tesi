@@ -11,7 +11,7 @@ from fhe.fhe import FHE
 from util.public_key import PublicKey
 
 sys.path.append('../utils')
-from utils import pk_exchange
+from utils import pk_exchange, socket_utils
 
 sys.path.append('../comunication')
 from comunication.producer.producer import Producer, Packet 
@@ -41,7 +41,10 @@ class SocketClient:
         flag = True
         while flag:
             cmd = input('Enter a new command: ')
-            self.__producer.execute(cmd, self.__socket)
+            p: Packet = self.__producer.execute(cmd, self.__socket)
+            data, size = socket_utils.recv(self.__socket)
+            packet: Packet = Packet(_json=str(data, encoding='utf8'))
+            logger.info('Request: ' + str(p.op) + ' -> ' + str(packet.status) + ': ' + packet.msg)
                 
 
 

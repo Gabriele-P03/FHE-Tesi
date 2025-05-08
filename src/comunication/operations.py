@@ -57,7 +57,12 @@ class Parameter(Generic[T]):
         return self.__key
     
     def data(self) -> str:
-        return self.key + "=" + self.value
+        buffer = '\"' + self.key + "\": "
+        if isinstance(self.__value, str):
+            buffer += '\"'+self.value+'\"'
+        else:
+            buffer += self.value
+        return buffer
     
 import copy    
 
@@ -75,6 +80,19 @@ class Operation:
     def __init__(self, _name: str, _parameters: List[Parameter] = []):
         self.__name = _name
         self.__parameters = _parameters
+
+    def setParameterValue(self, key:str, value):
+        for par in self.__parameters:
+            if par.key == key:
+                par.valorize(value=value)
+                return
+        raise command_exception.CommandException("Parameter " + key + " is not available")
+
+    def getParameterValue(self, key: str):
+        for par in self.__parameters:
+            if par.key == key:
+                return par.value
+        raise command_exception.CommandException("Parameter " + key + " is not available")
 
     @property
     def name(self):
@@ -160,11 +178,24 @@ class OPERATIONS(Enum):
                     ]
             )
     
-    PING = 3, Operation(
+    RESPONSE = 996, Operation(
+                    'response',
+                    []
+            )
+    PING = 997, Operation(
                     'ping',
                     []
             )
+    CLOSE = 999, Operation(
+                    'close',
+                    []
+            )
 
+def getOperationByIndex(i: int) -> OPERATIONS:
+    for cr in list(OPERATIONS):
+        if cr.value == i:
+            return cr
+    raise command_exception.CommandException("Command with index " + str(i) + " does not exists")
 
 def getOperationByName(name: str) -> OPERATIONS:
     for cr in list(OPERATIONS):

@@ -25,13 +25,15 @@ class Dispatcher:
         logger.info("Dispatcher Initialized")
 
     def dispatch(self, json: str, fhe: FHE) -> Packet:
+        logger.info("Dispatching...")
         packet: Packet = self.__parsePacket(json=json)
-        self.__execute(packet, fhe)
+        return self.__execute(packet, fhe)
 
     def __parsePacket(self, json: str) -> Packet:
         return Packet(json)
 
     def __execute(self, packet: Packet, fhe: FHE) -> Packet:
         from .wrappers import wrappers_router
-        wrappers_router.route(packet, self, fhe)
-        return Packet('', '')
+        err = wrappers_router.route(packet, self, fhe)
+        respPacket = Packet(_status=err)
+        return respPacket

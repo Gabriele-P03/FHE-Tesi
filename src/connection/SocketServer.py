@@ -14,6 +14,7 @@ from util.public_key import PublicKey
 
 sys.path.append('../comunication')
 from comunication.dispatcher.dispatcher import Dispatcher
+from comunication.operations import OPERATIONS
 
 port = INSTANCE.port.value
 host = 'localhost'
@@ -38,10 +39,16 @@ class SocketServer(socketserver.BaseRequestHandler):
         self.loop()
 
     def loop(self):
-        logger.info("Receiving...")
-        data, size = socket_utils.recv(self.request)
-        json_string = str(data, encoding='utf8')
-        self.__dispatcher.dispatch(json_string, self.fhe)
+        flag = True
+        while flag:
+            logger.info("Receiving...")
+            data, size = socket_utils.recv(self.request)
+            json_string = str(data, encoding='utf8')
+            packet = self.__dispatcher.dispatch(json_string, self.fhe)
+            if packet.op == OPERATIONS.CLOSE.value:
+                flag = False
+            self.request.sendall(bytes(packet.json(), encoding='utf8'))
+
 
         
 def getIstance() -> socketserver.TCPServer:
