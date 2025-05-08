@@ -33,6 +33,7 @@ class SocketServer(socketserver.BaseRequestHandler):
         logger.info("Connection enstabilished with " + self.client_address[0])
         self.fhe = FHE()
         self.__pk = pk_exchange.exchange(self.request, self.fhe.pk)
+        self.fhe.setPK(self.__pk)
         self.__connected = True
         self.__dispatcher = Dispatcher()
 
@@ -47,7 +48,7 @@ class SocketServer(socketserver.BaseRequestHandler):
             packet = self.__dispatcher.dispatch(json_string, self.fhe)
             if packet.op == OPERATIONS.CLOSE.value:
                 flag = False
-            self.request.sendall(bytes(packet.json(), encoding='utf8'))
+            self.request.sendall(bytes(packet.json(), encoding='utf8')+b'\n')
 
 
         

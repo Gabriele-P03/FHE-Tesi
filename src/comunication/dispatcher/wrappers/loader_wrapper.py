@@ -20,9 +20,10 @@ def load(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     if dispatcher.c is not None:
         return ERRORS.DATASET_ALREADY_LOADED
     try:
-        #dataset = path_utils.getDataset(op.getParameterValue('uri'))
-        #plain = fhe.encoder.encode(list(bytes(dataset, encoding='utf8')), 1 << 30)
-        plain = fhe.encoder.encode([0.5, 0.3 + 0.2j, 0.78, 0.88j], 1 << 30)
+        dataset = path_utils.getDataset(op.getParameterValue('uri'))
+        dec_list = [ ord(c) for c in dataset ]
+        plain = fhe.encoder.encode(dec_list)
+
         c = fhe.encryptor.encrypt(plain)
         dispatcher.c = c
         return ERRORS.OK

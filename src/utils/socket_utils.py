@@ -8,8 +8,11 @@ def recv(__socket):
     bSize = INSTANCE.buffer_size.value
     pSize = INSTANCE.packet_size.value
     while True:
-        if b'\n' in data or size > bSize:
+        if size > bSize:
             break
+        if len(data) > 0:
+            if b'\n' == data[-1:]:
+                break
         tmp = __socket.recv(pSize)
         data += tmp
         size += len(tmp)

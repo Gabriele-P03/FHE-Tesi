@@ -29,8 +29,8 @@ class Producer:
         op = op_enum.operation.__copy__()
         op.storeParameters(splitted_cmd) #Store parameters
         packet = Packet(_data=op.data(), _op=op_enum.value)
-        bs = bytes(packet.json(), encoding='utf8')
-        socket.send(bs)
+        bs = bytes(packet.json(), encoding='utf8')+b'\n'
+        socket.sendall(bs)
         return packet
         
 

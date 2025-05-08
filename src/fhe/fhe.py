@@ -1,9 +1,9 @@
-from ckks.ckks_decryptor import CKKSDecryptor
-from ckks.ckks_encoder import CKKSEncoder
-from ckks.ckks_encryptor import CKKSEncryptor
-from ckks.ckks_evaluator import CKKSEvaluator
-from ckks.ckks_key_generator import CKKSKeyGenerator
-from ckks.ckks_parameters import CKKSParameters
+from bfv.batch_encoder import BatchEncoder
+from bfv.bfv_decryptor import BFVDecryptor
+from bfv.bfv_encryptor import BFVEncryptor
+from bfv.bfv_evaluator import BFVEvaluator
+from bfv.bfv_key_generator import BFVKeyGenerator
+from bfv.bfv_parameters import BFVParameters
 
 from util.public_key import PublicKey
 
@@ -20,14 +20,14 @@ class FHE:
 
     __config = None
 
-    __parameters: CKKSParameters
+    __parameters: BFVParameters
 
     __keyGenerator = None
 
-    __encoder: CKKSEncoder
-    __encryptor: CKKSEncryptor
-    __decryptor: CKKSDecryptor
-    __evaluator: CKKSEvaluator 
+    __encoder: BatchEncoder
+    __encryptor: BFVEncryptor
+    __decryptor: BFVDecryptor
+    __evaluator: BFVEvaluator 
 
     def __init__(self):
         with getResourceFile(INSTANCE.port.assigned) as config_file:
@@ -35,43 +35,40 @@ class FHE:
         self.__loadParameters()    
         self.__keygen()  
         self.__initEncoder()
-        self.__initEncryptor()
+        #self.__initEncryptor()
         self.__initDecryptor()
         self.__initEvaluator()
 
         logger.info("FHE Initialized")
 
 
-    def __loadParameters(self) -> CKKSParameters:
-        poly_degree = int(self.__config['poly_degree'])
-        ciph_modulus = 1 << 600
-        big_modulus = 1 << 1200
-        scaling_factor = 1 << 30
+    def __loadParameters(self) -> BFVParameters:
+        degree = int(self.__config['degree'])
+        plain_modulus = int(self.__config['plain_modulus'])
+        ciph_modulus = int(self.__config['ciph_modulus'])
 
-        logger.info("FHE Parameters -> Poly Degree: "+str(poly_degree) + " Cipher Modulus: " + str(ciph_modulus) + " Big Modulus: " + str(big_modulus) + " Scaling Factor: " + str(scaling_factor) )
-
-        self.__parameters = CKKSParameters(
-            poly_degree=poly_degree,
-            ciph_modulus=ciph_modulus,
-            big_modulus=big_modulus,
-            scaling_factor=scaling_factor
+        self.__parameters = BFVParameters(
+            poly_degree=degree,
+            plain_modulus=plain_modulus,
+            ciph_modulus=ciph_modulus
         )
 
 
     def __keygen(self):
-        self.__keyGenerator = CKKSKeyGenerator(params=self.__parameters)
+        self.__keyGenerator = BFVKeyGenerator(params=self.__parameters)
 
     def __initEncoder(self):
-        self.__encoder = CKKSEncoder(self.__parameters)   
+        self.__encoder = BatchEncoder(self.__parameters)   
 
-    def __initEncryptor(self):
-        self.__encryptor = CKKSEncryptor(self.__parameters, self.__keyGenerator.public_key, self.__keyGenerator.secret_key)
+    def setPK(self, pk: PublicKey):
+        logger.info("Setting Encryptor with PK of other end-point")
+        self.__encryptor = BFVEncryptor(self.__parameters, pk)
 
     def __initDecryptor(self):
-        self.__decryptor = CKKSDecryptor(self.__parameters, self.__keyGenerator.secret_key)
+        self.__decryptor = BFVDecryptor(self.__parameters, self.__keyGenerator.secret_key)
 
     def __initEvaluator(self):
-        self.__evaluator = CKKSEvaluator(self.__parameters) 
+        self.__evaluator = BFVEvaluator(self.__parameters) 
 
     @property
     def pk(self):
