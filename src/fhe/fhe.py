@@ -41,6 +41,10 @@ class FHE:
     def __cryptoContext(self):
         logger.info("Generating Crypto Context...")
         self.__context = GenCryptoContext(self.__parameters)
+        logger.info("Enabling PKE")
+        self.__context.Enable(PKESchemeFeature.PKE)
+        self.__context.Enable(PKESchemeFeature.LEVELEDSHE)
+        self.__context.Enable(PKESchemeFeature.KEYSWITCH)
 
     def __keygen(self):
         logger.info("Generating Keys...")
@@ -54,8 +58,6 @@ class FHE:
             self.__public_key = DeserializePublicKeyString(pk_str, BINARY)
             self.__context
         else:
-            logger.info("Enabling PKE")
-            self.__context.Enable(PKESchemeFeature.PKE)
             keys = self.__context.KeyGen()
             self.__public_key = keys.publicKey
             self.__secret_key = keys.secretKey

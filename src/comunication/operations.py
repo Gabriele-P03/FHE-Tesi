@@ -171,12 +171,15 @@ class OPERATIONS(Enum):
     def operation(self) -> Operation:
         return self.__operation
 
-    LOAD = 1, Operation(
-                    'load', 
-                    [
-                        Parameter[str]('uri', True, str)
-                    ]
-            )
+    LOAD = 1, Operation('load', [
+        Parameter[str]('uri', True, str)
+    ])
+    
+    UNLOAD = 2, Operation('unload', [])
+
+    SUM = 3, Operation('sum', [
+        Parameter[str]('uri', True, str)
+    ])
     
     RESPONSE = 996, Operation(
                     'response',

@@ -17,22 +17,16 @@ sys.path.append('../../../utils')
 from utils import path_utils
 
 
-def load(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
-    if dispatcher.c is not None:
-        return ERRORS.DATASET_ALREADY_LOADED
+def sum(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
+    if dispatcher.c is None:
+        return ERRORS.NO_DATASET_LOADED
     try:
         dataset = path_utils.getDataset(op.getParameterValue('uri'))
         dec_list = [ ord(c) for c in dataset ]
         plain = fhe.cc.MakeCKKSPackedPlaintext(dec_list)
 
-        c = fhe.cc.Encrypt(fhe.publicKey, plain)
+        c = fhe.cc.EvalAdd(dispatcher.c, plain)
         dispatcher.c = c
         return ERRORS.OK
     except FileExistsError as e:
         return ERRORS.DATASET_NOTFOUND
-    
-def unload(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
-    if dispatcher.c is None:
-        return ERRORS.NO_DATASET_LOADED
-    dispatcher.c = None
-    return ERRORS.OK
