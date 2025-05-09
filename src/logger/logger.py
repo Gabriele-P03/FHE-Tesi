@@ -1,6 +1,6 @@
 import datetime as dt
 from enum import Enum
-
+import traceback
 from sys import gettrace as sys_gettrace
 
 #DEBUG is true if debugger is attached
@@ -54,3 +54,4 @@ def dbg(msg: str):
 
 def throw(exc: Exception):
     err(exc.__str__())
+    err(''.join(traceback.TracebackException.from_exception(exc).format()))

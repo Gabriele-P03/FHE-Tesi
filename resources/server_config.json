@@ -1,5 +1,7 @@
 {
     "degree": 8,
     "ciph_modulus": 8000000000000,
-    "plain_modulus": 17
+    "plain_modulus": 17,
+    "custom_keys": true,
+    "save_keys": false
 }

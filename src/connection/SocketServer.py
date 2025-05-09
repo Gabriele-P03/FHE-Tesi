@@ -32,7 +32,7 @@ class SocketServer(socketserver.BaseRequestHandler):
     def handle(self):
         logger.info("Connection enstabilished with " + self.client_address[0])
         self.fhe = FHE()
-        self.__pk = pk_exchange.exchange(self.request, self.fhe.pk)
+        self.__pk = pk_exchange.exchange(self.request, self.fhe.publicKey)
         self.fhe.setPK(self.__pk)
         self.__connected = True
         self.__dispatcher = Dispatcher()

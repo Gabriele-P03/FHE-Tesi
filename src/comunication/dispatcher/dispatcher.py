@@ -7,7 +7,7 @@ import sys
 
 sys.path.append('../')
 from comunication.packet import Packet, operations 
-from ckks.ckks_encryptor import Ciphertext
+from openfhe import Ciphertext
 
 sys.path.append('../../logger')
 from logger import logger

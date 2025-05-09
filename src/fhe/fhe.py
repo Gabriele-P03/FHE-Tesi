@@ -1,18 +1,10 @@
-from bfv.batch_encoder import BatchEncoder
-from bfv.bfv_decryptor import BFVDecryptor
-from bfv.bfv_encryptor import BFVEncryptor
-from bfv.bfv_evaluator import BFVEvaluator
-from bfv.bfv_key_generator import BFVKeyGenerator
-from bfv.bfv_parameters import BFVParameters
-
-from util.public_key import PublicKey
-
+from openfhe import *
 import json
 from logger import logger
 
 import sys
 sys.path.append('../utils')
-from utils.path_utils import getResourceFile
+from utils.path_utils import getResourceFile, readResourceFile, saveFile
 sys.path.append('../parameters')
 from parameters.parameters import INSTANCE
 
@@ -20,68 +12,79 @@ class FHE:
 
     __config = None
 
-    __parameters: BFVParameters
+    __parameters: CCParamsCKKSRNS
+    __context: CryptoContext
 
-    __keyGenerator = None
+    __secret_key: PrivateKey
+    __public_key: PublicKey
 
-    __encoder: BatchEncoder
-    __encryptor: BFVEncryptor
-    __decryptor: BFVDecryptor
-    __evaluator: BFVEvaluator 
+    __pk: PublicKey
 
     def __init__(self):
         with getResourceFile(INSTANCE.port.assigned) as config_file:
             self.__config = json.load(config_file)
-        self.__loadParameters()    
+        logger.info("FHE Initializing...")    
+        self.__loadParameters()  
+        self.__cryptoContext()
         self.__keygen()  
-        self.__initEncoder()
-        #self.__initEncryptor()
-        self.__initDecryptor()
-        self.__initEvaluator()
 
         logger.info("FHE Initialized")
 
 
-    def __loadParameters(self) -> BFVParameters:
+    def __loadParameters(self):
+        logger.info("Generating Parameters...")
         degree = int(self.__config['degree'])
         plain_modulus = int(self.__config['plain_modulus'])
         ciph_modulus = int(self.__config['ciph_modulus'])
+        self.__parameters = CCParamsCKKSRNS()
 
-        self.__parameters = BFVParameters(
-            poly_degree=degree,
-            plain_modulus=plain_modulus,
-            ciph_modulus=ciph_modulus
-        )
-
+    def __cryptoContext(self):
+        logger.info("Generating Crypto Context...")
+        self.__context = GenCryptoContext(self.__parameters)
 
     def __keygen(self):
-        self.__keyGenerator = BFVKeyGenerator(params=self.__parameters)
-
-    def __initEncoder(self):
-        self.__encoder = BatchEncoder(self.__parameters)   
-
-    def setPK(self, pk: PublicKey):
-        logger.info("Setting Encryptor with PK of other end-point")
-        self.__encryptor = BFVEncryptor(self.__parameters, pk)
-
-    def __initDecryptor(self):
-        self.__decryptor = BFVDecryptor(self.__parameters, self.__keyGenerator.secret_key)
-
-    def __initEvaluator(self):
-        self.__evaluator = BFVEvaluator(self.__parameters) 
+        logger.info("Generating Keys...")
+        flagGenKey = self.__config['custom_keys']
+        if flagGenKey:
+            logger.info("Rading Secret Key from private.pem")
+            sk_str = readResourceFile('private.pem', mode='rb')
+            self.__secret_key = DeserializePrivateKeyString(sk_str, BINARY)
+            logger.info("Rading Public Key from public.pem")
+            pk_str = readResourceFile('public.pem', mode='rb')
+            self.__public_key = DeserializePublicKeyString(pk_str, BINARY)
+            self.__context
+        else:
+            logger.info("Enabling PKE")
+            self.__context.Enable(PKESchemeFeature.PKE)
+            keys = self.__context.KeyGen()
+            self.__public_key = keys.publicKey
+            self.__secret_key = keys.secretKey
+            if self.__config['save_keys']:
+                logger.info("Storing Public Key in public.pem")
+                saveFile('public.pem', Serialize(self.__public_key, BINARY), mode='wb')
+                logger.info("Storing Secret Key in private.pem")
+                saveFile('private.pem', Serialize(self.__secret_key, BINARY), mode='wb')
+                
 
     @property
-    def pk(self):
-        
-        return self.__keyGenerator.public_key 
+    def publicKey(self) -> PublicKey:
+        return self.__public_key
+    
+    def setPK(self, _pk: PublicKey):
+        self.__pk = _pk
+
+    @property
+    def pk(self) -> PublicKey:
+        return self.__pk
     
     @property
-    def encryptor(self):
-        return self.__encryptor
+    def secretKey(self) -> PrivateKey:
+        return self.__secret_key
     
     @property
-    def encoder(self):
-        return self.__encoder
+    def cc(self) -> CryptoContext:
+        return self.__context
+
 
 
 

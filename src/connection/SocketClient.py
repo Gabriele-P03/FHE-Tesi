@@ -33,7 +33,7 @@ class SocketClient:
         logger.info("Client connected to " + str(INSTANCE.server_ip.value) + ":" + str(INSTANCE.server_port.value))
 
         self.__fhe = FHE()
-        self.__pk = pk_exchange.exchange(self.__socket, self.__fhe.pk)
+        self.__pk = pk_exchange.exchange(self.__socket, self.__fhe.publicKey)
 
         self.__producer = Producer()
     

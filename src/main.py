@@ -32,3 +32,21 @@ if __name__ == '__main__':
     init()
     run()
 
+'''
+
+from openfhe import *
+
+parameters = CCParamsCKKSRNS()
+cc = GenCryptoContext(parameters)
+cc.Enable(PKESchemeFeature.PKE)
+key_pair = cc.KeyGen()
+
+with open('private.pem', 'wb') as f:
+    print(key_pair.secretKey.GetKeyTag())
+    f.write(Serialize(key_pair.secretKey, BINARY))
+
+
+with open('private.pem', 'rb') as x:
+    print(DeserializePrivateKeyString(x.read(), BINARY).GetKeyTag())
+
+'''    

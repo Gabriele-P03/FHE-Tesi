@@ -1,4 +1,4 @@
-from util.public_key import PublicKey
+from openfhe import PublicKey, Serialize, BINARY, DeserializePublicKeyString
 
 import sys
 sys.path.append('../parameters')
@@ -7,7 +7,7 @@ from parameters.parameters import INSTANCE
 sys.path.append('../logger')
 from logger import logger
 
-from utils.socket_utils import recv
+from utils.socket_utils import recv, send
 
 import pickle
 
@@ -23,11 +23,12 @@ def __receive(__socket) -> PublicKey:
     return __composePK(p)
 
 def __send(__socket, pk: PublicKey):
-    p = pickle.dumps(pk)
-    logger.info("Sending " + str(len(p)) + " bytes of PK. Last item: " + str(p[-1]))
-    p += b'\n'
-    __socket.sendall(p)
 
-def __composePK(p) -> PublicKey:
-    return pickle.loads(p)
+    p = Serialize(pk, BINARY)
+    logger.info("Sending " + str(len(p)) + " bytes of PK. Last item: " + str(p[-1]))
+    send(__socket, p)
+
+def __composePK(p: str) -> PublicKey:
+    logger.info("Recomposing PK with " + str(len(p)) + " bytes")
+    return DeserializePublicKeyString(p, BINARY)
 
