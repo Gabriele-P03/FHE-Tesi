@@ -21,7 +21,9 @@ def load(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     if dispatcher.c is not None:
         return ERRORS.DATASET_ALREADY_LOADED
     try:
-        dataset = path_utils.getDataset(op.getParameterValue('uri'))
+        uri = op.getParameterValue('uri')
+        logger.info("Loading " + uri + " dataset")
+        dataset = path_utils.getDataset(uri)
         dec_list = [ ord(c) for c in dataset ]
         plain = fhe.cc.MakeCKKSPackedPlaintext(dec_list)
 
@@ -34,5 +36,11 @@ def load(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
 def unload(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     if dispatcher.c is None:
         return ERRORS.NO_DATASET_LOADED
+    logger.info("Unloading dataset")
     dispatcher.c = None
     return ERRORS.OK
+
+
+def close(op: Operation, dispatcher: Dispatcher, fhe: FHE):
+    unload(op, dispatcher, fhe)
+    exit(1)

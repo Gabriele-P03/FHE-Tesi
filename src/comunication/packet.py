@@ -43,6 +43,7 @@ class Packet:
             else:
                 self.__status = _status
                 self.__op = operations.OPERATIONS.RESPONSE.value
+                self.__data=_data
 
         self.ens()    
 

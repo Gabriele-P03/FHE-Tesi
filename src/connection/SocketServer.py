@@ -42,7 +42,7 @@ class SocketServer(socketserver.BaseRequestHandler):
     def loop(self):
         flag = True
         while flag:
-            logger.info("Receiving...")
+            logger.info("Waiting for a new command...")
             data, size = socket_utils.recv(self.request)
             json_string = str(data, encoding='utf8')
             packet = self.__dispatcher.dispatch(json_string, self.fhe)
@@ -53,9 +53,7 @@ class SocketServer(socketserver.BaseRequestHandler):
 
         
 def getIstance() -> socketserver.TCPServer:
-    
-    with socketserver.TCPServer( (host, port), SocketServer) as server:
-        server.serve_forever()
-        server.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    __instance = socketserver.TCPServer( (host, port), SocketServer)
+    __instance.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     logger.info("Server Socket listening...")
-    return server
+    return __instance

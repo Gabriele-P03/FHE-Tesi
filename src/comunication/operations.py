@@ -181,6 +181,11 @@ class OPERATIONS(Enum):
         Parameter[str]('uri', True, str)
     ])
     
+
+    SCREEN = 995, Operation(
+                'screen', 
+                []
+            )
     RESPONSE = 996, Operation(
                     'response',
                     []

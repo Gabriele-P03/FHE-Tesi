@@ -21,7 +21,9 @@ def sum(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     if dispatcher.c is None:
         return ERRORS.NO_DATASET_LOADED
     try:
-        dataset = path_utils.getDataset(op.getParameterValue('uri'))
+        uri = op.getParameterValue('uri')
+        logger.info("Summing " + uri + " dataset")
+        dataset = path_utils.getDataset(uri)
         dec_list = [ ord(c) for c in dataset ]
         plain = fhe.cc.MakeCKKSPackedPlaintext(dec_list)
 

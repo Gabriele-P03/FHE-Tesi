@@ -14,7 +14,8 @@ sys.path.append('../utils')
 from utils import pk_exchange, socket_utils
 
 sys.path.append('../comunication')
-from comunication.producer.producer import Producer, Packet 
+from comunication.producer.producer import Producer, Packet
+from comunication.producer.viewer import view 
 
 class SocketClient:
 
@@ -45,8 +46,12 @@ class SocketClient:
             data, size = socket_utils.recv(self.__socket)
             packet: Packet = Packet(_json=str(data, encoding='utf8'))
             logger.info('Request: ' + str(p.op) + ' -> ' + str(packet.status) + ': ' + packet.msg)
+            view(p, packet)
                 
-
+    def close(self):
+        if self.__socket is not None:
+            self.__producer.execute('close', self.__socket)
+        self.__socket.close()
 
 
 
