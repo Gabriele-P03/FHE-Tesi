@@ -7,7 +7,6 @@ import sys
 
 sys.path.append('../')
 from comunication.packet import Packet, operations 
-from openfhe import Ciphertext
 
 sys.path.append('../../logger')
 from logger import logger
@@ -15,11 +14,14 @@ from logger import logger
 sys.path.append('../../../fhe')
 from fhe.fhe import FHE
 
+sys.path.append('../../dataset')
+from dataset.dataset import Dataset
+
 
 
 class Dispatcher:
 
-    c: Ciphertext = None 
+    data: Dataset = None 
 
     def __init__(self):
         logger.info("Dispatcher Initialized")

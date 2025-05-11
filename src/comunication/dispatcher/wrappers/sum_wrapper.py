@@ -13,8 +13,7 @@ sys.path.append('../../')
 from comunication.operations import Operation, OPERATIONS 
 from comunication.errors import ERRORS
 
-sys.path.append('../../../utils')
-from utils import path_utils
+from . import loader_wrapper
 
 
 def sum(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
@@ -23,12 +22,7 @@ def sum(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     try:
         uri = op.getParameterValue('uri')
         logger.info("Summing " + uri + " dataset")
-        dataset = path_utils.getDataset(uri)
-        dec_list = [ ord(c) for c in dataset ]
-        plain = fhe.cc.MakeCKKSPackedPlaintext(dec_list)
-
-        c = fhe.cc.EvalAdd(dispatcher.c, plain)
-        dispatcher.c = c
+        dataset = loader_wrapper.createDataset(uri, fhe=fhe)
         return ERRORS.OK
     except FileExistsError as e:
         return ERRORS.DATASET_NOTFOUND

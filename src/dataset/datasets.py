@@ -26,3 +26,8 @@ class DATASETTYPES(Enum):
 
     CSV = 0, 'csv'
 
+def fromFormat(format: str):
+    for c in list(DATASETTYPES):
+        if c.format == format:
+            return c
+    return None

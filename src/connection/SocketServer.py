@@ -48,7 +48,7 @@ class SocketServer(socketserver.BaseRequestHandler):
             packet = self.__dispatcher.dispatch(json_string, self.fhe)
             if packet.op == OPERATIONS.CLOSE.value:
                 flag = False
-            self.request.sendall(bytes(packet.json(), encoding='utf8')+b'\n')
+            self.request.sendall(bytes(packet.json(), encoding='utf8')+b'\0\0\0\0\0\0\0\0')
 
 
         

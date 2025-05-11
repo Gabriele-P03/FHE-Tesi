@@ -10,6 +10,7 @@ class ERRORS(Enum):
     DATASET_NOTFOUND = 2
     DATASET_ALREADY_LOADED = 3
     NO_DATASET_LOADED = 4
+    DATASET_CORRUPTED = 5
 
 
 def getMessageErrorByIndex(er: int):
@@ -24,3 +25,5 @@ def getMessageErrorByIndex(er: int):
             return 'There\'s already a dataset loaded. Close it before'
         case ERRORS.NO_DATASET_LOADED.value:
             return 'There\'s no dataset to unload'
+        case ERRORS.DATASET_CORRUPTED:
+            return 'There\'s an invalid value in the selected dataset'

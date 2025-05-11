@@ -21,7 +21,7 @@ class Parameters:
     server_ip = Parameter('s', 'server', '', 'localhost', True, str)
     server_port = Parameter('e', 'serverport', 0, 8080, True, int)
     buffer_size = Parameter('b', 'buffer', 0, 10000000, True, int)
-    packet_size = Parameter('p', 'packet', 0, 10000000, True, int)
+    packet_size = Parameter('p', 'packet', 0, 2048, True, int)
 
     __mapper = {
         'vverbosity': verbosity,

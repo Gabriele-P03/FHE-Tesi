@@ -10,16 +10,19 @@ def recv(__socket):
     data = b''
     bSize = INSTANCE.buffer_size.value
     pSize = INSTANCE.packet_size.value
+    i = 0
     while True:
+        i += 1
         if size > bSize:
             break
         if len(data) > 0:
-            if b'\n' == data[-1:]:
+            if b'\0\0\0\0\0\0\0\0' == data[-8:]:
                 break
         tmp = __socket.recv(pSize)
         data += tmp
         size += len(tmp)
-    return data, size
+        #logger.dbg(f'Read i: {i} -> {size} bytes')
+    return data[:-8], size-8
 
 
 
@@ -27,8 +30,10 @@ def send(__socket, data: bytes):
     size = len(data)
     pSize = INSTANCE.packet_size.value    
     it = int((size/pSize))+1
+    #logger.warn(f'Size: {size}. It: {it}')
     for i in range(0, it):
         start = i*pSize
         end = min( size-i*pSize, pSize) 
+        #logger.warn(f'i: {i}. Start: {start}. End: {end}')
         __socket.sendall(data[start:start+end])
-    __socket.sendall(b'\n')
+    __socket.sendall(b'\0\0\0\0\0\0\0\0')

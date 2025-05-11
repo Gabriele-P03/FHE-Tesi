@@ -1,6 +1,8 @@
 from openfhe import PublicKey, Serialize, BINARY, DeserializePublicKeyString
 
 import sys
+import time
+
 sys.path.append('../parameters')
 from parameters.parameters import INSTANCE
 
@@ -9,12 +11,16 @@ from logger import logger
 
 from utils.socket_utils import recv, send
 
-import pickle
 
 def exchange(__socket, pk: PublicKey) -> PublicKey:
     logger.info("Exchaning PK...")
-    __send(__socket, pk)
-    pk2 = __receive(__socket)
+    if INSTANCE.port.assigned:
+        __send(__socket, pk)
+        pk2 = __receive(__socket)
+    else:
+        time.sleep(1)
+        pk2 = __receive(__socket)
+        __send(__socket, pk)
     logger.info("Exchangin Done!")
     return pk2
 
