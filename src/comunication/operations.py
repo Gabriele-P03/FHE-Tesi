@@ -146,9 +146,10 @@ class Operation:
         buffer = "["
         for i in range(0, len(self.__parameters)):
             par = self.__parameters[i]
-            buffer += '{' + par.data() + '}'
-            if i < len(self.__parameters)-1:
-                buffer += ','
+            if par.valorized:
+                if i > 0 and i < len(self.__parameters):
+                    buffer += ','
+                buffer += '{' + par.data() + '}'
         buffer += "]"
         return buffer
 
@@ -178,7 +179,8 @@ class OPERATIONS(Enum):
     UNLOAD = 2, Operation('unload', [])
 
     SUM = 3, Operation('sum', [
-        Parameter[str]('uri', True, str)
+        Parameter[str]('uri', True, str),
+        Parameter[str]('columns', False, str)
     ])
     
 

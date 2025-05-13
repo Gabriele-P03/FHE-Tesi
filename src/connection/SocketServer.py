@@ -3,7 +3,7 @@ import socket
 from parameters.parameters import INSTANCE
 import logger.logger as logger
 
-import sys
+import sys, json
 sys.path.append('../fhe')
 from fhe.fhe import FHE
 
@@ -46,9 +46,7 @@ class SocketServer(socketserver.BaseRequestHandler):
             data, size = socket_utils.recv(self.request)
             json_string = str(data, encoding='utf8')
             packet = self.__dispatcher.dispatch(json_string, self.fhe)
-            if packet.op == OPERATIONS.CLOSE.value:
-                flag = False
-            self.request.sendall(bytes(packet.json(), encoding='utf8')+b'\0\0\0\0\0\0\0\0')
+            self.request.sendall(bytes(json.dumps(packet.json()), encoding='utf8')+b'\0\0\0\0\0\0\0\0')
 
 
         

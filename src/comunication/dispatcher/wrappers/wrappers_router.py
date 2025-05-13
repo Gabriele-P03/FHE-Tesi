@@ -6,6 +6,8 @@ from comunication.packet import Packet
 from comunication.operations import OPERATIONS 
 from comunication.errors import ERRORS
 
+from logger import logger
+
 sys.path.append('../../../fhe')
 from fhe.fhe import FHE
 
@@ -24,4 +26,9 @@ def route(packet: Packet, dispatcher, fhe: FHE) -> Union[ERRORS, bytes]:
             err = sum_wrapper.sum(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.SCREEN.value:
             err, data = screen_wrapper.screen(packet.toOperation(), dispatcher, fhe)
+        case OPERATIONS.CLOSE.value:
+            loader_wrapper.unload(packet.toOperation(), dispatcher, fhe)
+            err = ERRORS.OK
+            logger.info('Exiting...')
+            exit(1)
     return err.value, data

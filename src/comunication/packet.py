@@ -6,8 +6,11 @@ of error.
 '''
 
 from comunication import errors, operations
-import json
+import json, sys
 from types import SimpleNamespace
+
+sys.path.append('../logger')
+from logger import logger
 
 from comunication.packet_json_encoder import JsonEncoder
 
@@ -25,6 +28,7 @@ class Packet:
 
     def __init__(self, _json: str = '', _data: str = '', _op: int = operations.OPERATIONS.PING.value, _status: int = -1):
         if len(_json) > 0:
+            logger.dbg(f'Received {len(_json)} bytes of json')
             dict = json.loads(_json)
             if 'op' in dict:
                 self.__op = int(dict['op'])
@@ -44,16 +48,17 @@ class Packet:
                 self.__status = _status
                 self.__op = operations.OPERATIONS.RESPONSE.value
                 self.__data=_data
-
+        
         self.ens()    
 
     def ens(self):
         if self.__op == -1:
-            self.__status = errors.ERRORS.INVALID_OPERATION._value_
+            self.__status = errors.ERRORS.INVALID_OPERATION.value
         
-        if self.__status is not errors.ERRORS.OK._value_:
+        if self.__status is not errors.ERRORS.OK.value:
             self.__valid = False
             self.__msg = errors.getMessageErrorByIndex(self.__status)
+        
     
     @property
     def status(self):
@@ -76,16 +81,20 @@ class Packet:
         return self.__msg
 
     def json(self):
-        js = json.dumps(self, indent=1, cls=JsonEncoder)
+        js = json.loads("{\"status\": "+ str(self.status) +"}")
+        js.update({"op": self.op})
+        js.update({"msg": self.msg})
+        js.update({"value": self.valid})
+        js.update({"data": self.__data})
         return js
     
     def toOperation(self) -> operations.Operation:
         o: operations.OPERATIONS = operations.getOperationByIndex(self.op)
         operation = o.operation.__copy__()
-        parametersJsonArray = json.loads(self.data, object_hook=lambda d: SimpleNamespace(**d))
+        parametersJsonArray = json.loads(self.data)
         for par in parametersJsonArray:
-            d = par.__dict__
-            for c in d:
-                operation.setParameterValue(c, d[c])
+            for key in par:
+                value = par[key]
+                operation.setParameterValue(key, value)
         return operation
 

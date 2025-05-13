@@ -36,7 +36,7 @@ def log(logtype: LOGTYPE, msg: str):
     color = _getColorByLogType(logtype).value
     ts = _getCurrentTimestamp()
     ts = "[ " + ts + " ]: "
-    print(color + ts + msg + color)
+    print(color + ts + msg)
 
 def info(msg: str):
     log(LOGTYPE.INFO, msg)

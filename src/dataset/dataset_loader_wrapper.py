@@ -23,7 +23,7 @@ def load_csv(stream, fhe: FHE, separator = ';'):
     columns = [ Column(c) for c in headers_str_splitted ]
     data = []
     cc = fhe.cc
-    pk = fhe.publicKey
+    pk = fhe.pk
     row_index = 0
     for line in stream:
         row_index += 1
@@ -38,7 +38,6 @@ def load_csv(stream, fhe: FHE, separator = ';'):
                 logger.err('Row ' + str(row_index) + " Col " + columns[i].name + " has an invalid value: " + str(values[i]) )
             pltxt = cc.MakeCKKSPackedPlaintext(f)
             enc = cc.Encrypt(pk, pltxt)
-            print(f'Printing size of a cip: {sys.getsizeof(enc)}\n')
             ciphertexts.append(enc)    
         data.append(ciphertexts)
     return columns, data

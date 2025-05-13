@@ -17,6 +17,7 @@ class Column:
 
     def __init__(self, _name: str, _required: bool = False):
         super().__init__()
+        _name = _name.strip()
         if len(_name) < 1:
             raise DatasetException("Column's Name is empty")
         self.__name = _name
