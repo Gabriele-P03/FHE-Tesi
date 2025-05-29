@@ -10,14 +10,17 @@ from fhe.fhe import FHE
 sys.path.append('../utils')
 from utils import pk_exchange
 from utils import socket_utils
-from util.public_key import PublicKey
+from openfhe import PublicKey
 
 sys.path.append('../comunication')
 from comunication.dispatcher.dispatcher import Dispatcher
 from comunication.operations import OPERATIONS
 
+import zlib
+
 port = INSTANCE.port.value
 host = 'localhost'
+
 
 class SocketServer(socketserver.BaseRequestHandler):
 
@@ -46,7 +49,9 @@ class SocketServer(socketserver.BaseRequestHandler):
             data, size = socket_utils.recv(self.request)
             json_string = str(data, encoding='utf8')
             packet = self.__dispatcher.dispatch(json_string, self.fhe)
-            self.request.sendall(bytes(json.dumps(packet.json()), encoding='utf8')+b'\0\0\0\0\0\0\0\0')
+            buffer = bytes(json.dumps(packet.json()), encoding='utf8')
+            buffer = zlib.compress(buffer)+b'\0\0\0\0\0\0\0\0'
+            self.request.sendall(buffer)
 
 
         

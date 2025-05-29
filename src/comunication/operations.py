@@ -91,7 +91,9 @@ class Operation:
     def getParameterValue(self, key: str):
         for par in self.__parameters:
             if par.key == key:
-                return par.value
+                if par.valorized:
+                    return par.value
+                raise command_exception.CommandException("Parameter " + key + " was not passed")
         raise command_exception.CommandException("Parameter " + key + " is not available")
 
     @property
@@ -179,6 +181,11 @@ class OPERATIONS(Enum):
     UNLOAD = 2, Operation('unload', [])
 
     SUM = 3, Operation('sum', [
+        Parameter[str]('uri', True, str),
+        Parameter[str]('columns', False, str)
+    ])
+
+    MUL = 4, Operation('mul', [
         Parameter[str]('uri', True, str),
         Parameter[str]('columns', False, str)
     ])

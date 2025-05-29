@@ -23,7 +23,7 @@ from exception.command_exception import CommandException
 from exception.dataset_exception import DatasetException
 
 
-def sum(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
+def mul(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     if dispatcher.data is None:
         return ERRORS.NO_DATASET_LOADED
     try:
@@ -38,7 +38,7 @@ def sum(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
         except CommandException:
             cols = list( map(lambda x: x.name, dataset.columns) )
         ext_indeces = dataset_utils.match_indices_cols(columns, cols, dataset)
-        logger.info(f'Summing {uri} dataset by columns: {cols}. Indeces Linkage: {ext_indeces}')
+        logger.info(f'Multipling {uri} dataset by columns: {cols}. Indeces Linkage: {ext_indeces}')
         
 
         loaded_dataset = dispatcher.data.data
@@ -48,7 +48,7 @@ def sum(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
             for i1 in range(0,loaded_row_size):
                 c = loaded_dataset[i1][j]
                 c1 = dataset.data[i1][ext_indeces[j]]
-                c = fhe.cc.EvalAdd(c, c1)
+                c = fhe.cc.EvalMultNoRelin(c, c1)
                 loaded_dataset[i1][j] = c
         
         return ERRORS.OK

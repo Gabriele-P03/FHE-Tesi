@@ -13,7 +13,7 @@ from utils.socket_utils import recv, send
 
 
 def exchange(__socket, pk: PublicKey) -> PublicKey:
-    logger.info("Exchaning PK...")
+    logger.info("Exchanging PK...")
     if INSTANCE.port.assigned:
         __send(__socket, pk)
         pk2 = __receive(__socket)

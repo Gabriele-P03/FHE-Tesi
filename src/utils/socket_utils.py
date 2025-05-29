@@ -5,6 +5,8 @@ from parameters.parameters import INSTANCE
 sys.path.append('../logger')
 from logger import logger
 
+import zlib
+
 def recv(__socket):
     size = 0
     data = b''
@@ -22,11 +24,16 @@ def recv(__socket):
         data += tmp
         size += len(tmp)
         #logger.dbg(f'Read i: {i} -> {size} bytes')
-    return data[:-8], size-8
+    data = data[:-8]
+    data = zlib.decompress(data)
+    return data, size-8
 
 
 
 def send(__socket, data: bytes):
+
+    data = zlib.compress(data)
+
     size = len(data)
     pSize = INSTANCE.packet_size.value    
     it = int((size/pSize))+1

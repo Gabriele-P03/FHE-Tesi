@@ -8,7 +8,7 @@ from parameters.parameters import INSTANCE
 sys.path.append('../fhe')
 from fhe.fhe import FHE
 
-from util.public_key import PublicKey
+from openfhe import PublicKey
 
 sys.path.append('../utils')
 from utils import pk_exchange, socket_utils
@@ -45,13 +45,14 @@ class SocketClient:
             cmd = input('Enter a new command: ')
             p: Packet = self.__producer.execute(cmd, self.__socket)
             if p is not None:
+                if p.op == OPERATIONS.CLOSE.value:
+                    logger.info('Exiting...')
+                    exit(1)
                 data, size = socket_utils.recv(self.__socket)
                 packet: Packet = Packet(_json=str(data, encoding='utf8'))
                 logger.info('Request: ' + str(p.op) + ' -> ' + str(packet.status) + ': ' + packet.msg)
                 view(p, packet, self.__fhe)
-                if p.op == OPERATIONS.CLOSE.value:
-                    logger.info('Exiting...')
-                    exit(1)
+
                 
     def close(self):
         if self.__socket is not None:

@@ -15,6 +15,8 @@ from comunication import operations
 sys.path.append('../../logger')
 from logger import logger
 
+import zlib
+
 class Producer:
 
     def __new__(cls):
@@ -33,7 +35,9 @@ class Producer:
             logger.err(str(e))
             return None
         packet = Packet(_data=op.data(), _op=op_enum.value)
-        bs = bytes(json.dumps(packet.json()), encoding='utf8')+b'\0\0\0\0\0\0\0\0'
+        bs = bytes(json.dumps(packet.json()), encoding='utf8')
+        bs = zlib.compress(bs)
+        bs = bs+b'\0\0\0\0\0\0\0\0'
         socket.sendall(bs)
         return packet
         

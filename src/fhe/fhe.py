@@ -56,12 +56,18 @@ class FHE:
 
     def __keygen(self):
         flagGenKey = self.__config['custom_keys']
+        flagServer = INSTANCE.port.assigned
+        sk_file_path = 'private_client.pem'
+        pk_file_path = 'public_client.pem'
+        if flagServer:
+            sk_file_path = 'private_server.pem'
+            pk_file_path = 'public_server.pem'
         if flagGenKey:
-            logger.info("Rading Secret Key from private.pem")
-            sk_str = readResourceFile('private.pem', mode='rb')
+            logger.info(f'Reading Secret Key from {sk_file_path}')
+            sk_str = readResourceFile(sk_file_path, mode='rb')
             self.__secret_key = DeserializePrivateKeyString(sk_str, BINARY)
-            logger.info("Rading Public Key from public.pem")
-            pk_str = readResourceFile('public.pem', mode='rb')
+            logger.info(f'Reading Public Key from {pk_file_path}')
+            pk_str = readResourceFile(pk_file_path, mode='rb')
             self.__public_key = DeserializePublicKeyString(pk_str, BINARY)
             self.__context
         else:
@@ -70,11 +76,12 @@ class FHE:
             self.__public_key = keys.publicKey
             self.__secret_key = keys.secretKey
             if self.__config['save_keys']:
-                logger.info("Storing Public Key in public.pem")
-                saveFile('public.pem', Serialize(self.__public_key, BINARY), mode='wb')
-                logger.info("Storing Secret Key in private.pem")
-                saveFile('private.pem', Serialize(self.__secret_key, BINARY), mode='wb')
-                
+                logger.info(f'Storing Public Key in {pk_file_path}')
+                saveFile(pk_file_path, Serialize(self.__public_key, BINARY), mode='wb')
+                logger.info(f'Storing Secret Key in {sk_file_path}')
+                saveFile(sk_file_path, Serialize(self.__secret_key, BINARY), mode='wb')
+        logger.info("Evaluating MultKeyGen...")
+        self.cc.EvalMultKeyGen(self.__secret_key)        
 
     @property
     def publicKey(self) -> PublicKey:
