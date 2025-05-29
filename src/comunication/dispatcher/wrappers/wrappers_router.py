@@ -1,5 +1,5 @@
 import sys
-from . import loader_wrapper, sum_wrapper, screen_wrapper, mul_wrapper
+from . import loader_wrapper, sum_wrapper, screen_wrapper, mul_wrapper, sub_wrapper
 
 sys.path.append('../../')
 from comunication.packet import Packet 
@@ -26,6 +26,8 @@ def route(packet: Packet, dispatcher, fhe: FHE) -> Union[ERRORS, bytes]:
             err = sum_wrapper.sum(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.MUL.value:
             err = mul_wrapper.mul(packet.toOperation(), dispatcher, fhe)
+        case OPERATIONS.SUB.value:
+            err = sub_wrapper.sub(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.SCREEN.value:
             err, data = screen_wrapper.screen(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.CLOSE.value:

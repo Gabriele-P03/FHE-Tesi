@@ -189,6 +189,11 @@ class OPERATIONS(Enum):
         Parameter[str]('uri', True, str),
         Parameter[str]('columns', False, str)
     ])
+
+    SUB = 5, Operation('sub', [
+        Parameter[str]('uri', True, str),
+        Parameter[str]('columns', False, str)
+    ])
     
 
     SCREEN = 995, Operation(
