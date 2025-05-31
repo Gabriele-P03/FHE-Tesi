@@ -1,3 +1,5 @@
 RSA PK da CLI
 
 Possibilità di vedere il dataset cifrato e in chiaro
+
+SI ricorda che la cifratura asimmetrica è limitata dalla luncghezza della chiave: se la chiave è lunga 2048 bit, il testo da cifrare può essere al massimo lungo 2048 bit

@@ -1,7 +1,4 @@
-from openfhe import PublicKey, Serialize, BINARY, DeserializePublicKeyString
-
 import sys
-import time
 
 sys.path.append('../parameters')
 from parameters.parameters import INSTANCE
@@ -9,32 +6,33 @@ from parameters.parameters import INSTANCE
 sys.path.append('../logger')
 from logger import logger
 
+sys.path.append('../exception')
+from exception import key_exception
+
 from utils.socket_utils import recv, send
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 
-
-def exchange(__socket, pk: PublicKey) -> PublicKey:
+def exchange(__socket, pk):
     logger.info("Exchanging PK...")
     if INSTANCE.port.assigned:
-        __send(__socket, pk)
-        pk2 = __receive(__socket)
+        pk = __receive(__socket)
+        return pk
     else:
-        time.sleep(1)
-        pk2 = __receive(__socket)
         __send(__socket, pk)
-    logger.info("Exchangin Done!")
-    return pk2
+        return None
+    
 
-def __receive(__socket) -> PublicKey:
+def __receive(__socket) ->  rsa.RSAPublicKey:
     p, p_size = recv(__socket)
-    return __composePK(p)
+    logger.info(f'Received {p_size} bytes of Client\'s PK')
+    pk = serialization.load_pem_public_key(p)
+    if not isinstance(pk, rsa.RSAPublicKey):
+        raise key_exception.KeyException("It seems like received Client's Public Key is not valid")
+    return pk
 
-def __send(__socket, pk: PublicKey):
-
-    p = Serialize(pk, BINARY)
-    logger.info("Sending " + str(len(p)) + " bytes of PK. Last item: " + str(p[-1]))
-    send(__socket, p)
-
-def __composePK(p: str) -> PublicKey:
-    logger.info("Recomposing PK with " + str(len(p)) + " bytes")
-    return DeserializePublicKeyString(p, BINARY)
+def __send(__socket, pk):
+    logger.info(f'Sending {len(pk)} + bytes of PK.')
+    pk = bytes(pk, encoding='utf8')
+    send(__socket, pk)
 

@@ -194,6 +194,13 @@ class OPERATIONS(Enum):
         Parameter[str]('uri', True, str),
         Parameter[str]('columns', False, str)
     ])
+
+    DIV = 6, Operation('div', [
+        Parameter[str]('uri', True, str),
+        Parameter[str]('columns', False, str)
+    ])
+    BST = 5, Operation('bootstrap', [
+    ])
     
 
     SCREEN = 995, Operation(

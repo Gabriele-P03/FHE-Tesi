@@ -5,12 +5,14 @@ import logger.logger as logger
 
 import sys, json
 sys.path.append('../fhe')
-from fhe.fhe import FHE
+from sec.fhe import FHE
 
 sys.path.append('../utils')
 from utils import pk_exchange
 from utils import socket_utils
-from openfhe import PublicKey
+
+
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 sys.path.append('../comunication')
 from comunication.dispatcher.dispatcher import Dispatcher
@@ -26,7 +28,7 @@ class SocketServer(socketserver.BaseRequestHandler):
 
     fhe: FHE = None
 
-    __pk: PublicKey = None
+    __pk: rsa.RSAPublicKey = None
 
     __connected = False
 

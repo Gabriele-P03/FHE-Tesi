@@ -4,7 +4,7 @@ sys.path.append('../../../logger')
 from logger import logger
 
 sys.path.append('../../../fhe')
-from fhe.fhe import FHE
+from sec.fhe import FHE
 
 sys.path.append('..')
 from ..dispatcher import Dispatcher
@@ -35,7 +35,6 @@ def bootstrap(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
         row = dataset.data[i]
         for j in range(cols_size):
             ciphertext = row[j]
-
-            test_btstrp = cc.EvalBootstrap(ciphertext)
-            #Now, calculate precision
-            res = cc.Decrypt(test_btstrp)
+            #Evaluate the single precision
+            row[j] = cc.EvalBootstrap(ciphertext, 2, 17)
+    return ERRORS.OK

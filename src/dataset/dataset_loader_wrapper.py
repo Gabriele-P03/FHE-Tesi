@@ -9,7 +9,7 @@ from openfhe import Ciphertext
 
 import sys
 sys.path.append('../fhe')
-from fhe.fhe import FHE
+from sec.fhe import FHE
 
 sys.path.append('../comunication')
 from comunication.errors import ERRORS
@@ -23,7 +23,7 @@ def load_csv(stream, fhe: FHE, separator = ';'):
     columns = [ Column(c) for c in headers_str_splitted ]
     data = []
     cc = fhe.cc
-    pk = fhe.pk
+    pk = fhe.publicKey
     row_index = 0
     for line in stream:
         row_index += 1

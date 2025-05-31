@@ -4,7 +4,7 @@ sys.path.append('../../../logger')
 from logger import logger
 
 sys.path.append('../../../fhe')
-from fhe.fhe import FHE
+from sec.fhe import FHE
 
 sys.path.append('..')
 from ..dispatcher import Dispatcher

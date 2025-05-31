@@ -1,1 +1,2 @@
-./libs/py-fhe
+cryptography
+pycryptodome

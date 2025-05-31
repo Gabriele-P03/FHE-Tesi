@@ -13,10 +13,10 @@ import json, pickle, sys
 sys.path.append('../exception')
 from exception.dataset_exception import DatasetException 
 
-from openfhe import Ciphertext, Serialize, BINARY
+from openfhe import Ciphertext, BINARY
 
 sys.path.append('../fhe')
-from fhe.fhe import FHE
+from sec.fhe import FHE
 
 class Dataset:
 
@@ -66,12 +66,12 @@ class Dataset:
         The single value is the ciphertext.
         Each single ciphertext must be decrypted bu client
     """
-    def toJson(self):
+    def toJson(self, fhe: FHE):
         js = []
         for row in self.__data:
             js_row = []
             for val in row:
-                b = Serialize(val, BINARY)
+                b = fhe.cc.Decrypt(fhe.secretKey, val).GetCKKSPackedValue()[0].real
                 js_row.append(str(b))  #Appending ciphertext
             js.append(js_row)
         return js

@@ -4,16 +4,18 @@ sys.path.append('../')
 from comunication.packet import Packet
 from comunication.operations import OPERATIONS
 
-sys.path.append('../../fhe')
-from fhe.fhe import FHE 
+sys.path.append('../../sec')
+from sec.rsa import RSA 
 
 sys.path.append('../../logger')
 from logger import logger
 
-from openfhe import DeserializeCiphertextString, BINARY, Ciphertext
-import json, binascii
+import json
 
-def view(req: Packet, res: Packet, fhe: FHE):
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+
+def view(req: Packet, res: Packet, rsa: RSA):
     if req.op == OPERATIONS.SCREEN.value:
         logger.info("Printing Current Cyphertext")
         data = json.loads(res.data)
@@ -23,10 +25,7 @@ def view(req: Packet, res: Packet, fhe: FHE):
             l = len(row)
             for i in range(0,l):
                 value = row[i]
-                value: bytes = eval(value)
-                c: Ciphertext = DeserializeCiphertextString(value, BINARY)
-                s = str(fhe.cc.Decrypt(fhe.secretKey, c).GetCKKSPackedValue()[0].real)
-                print(f'{s}', end='')
+                print(f'{value}', end='')
                 if i < l-1:
                     print(', ', end='')
             print()
