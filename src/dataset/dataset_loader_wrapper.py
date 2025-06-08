@@ -17,7 +17,7 @@ from comunication.errors import ERRORS
 sys.path.append('../logger')
 from logger import logger
 
-def load_csv(stream, fhe: FHE, separator = ';'):
+def load_csv(stream, fhe: FHE, separator = ';', reciprocal=False):
     headers_str: str = stream.readline()
     headers_str_splitted = headers_str.split(separator)
     columns = [ Column(c) for c in headers_str_splitted ]
@@ -33,9 +33,13 @@ def load_csv(stream, fhe: FHE, separator = ';'):
         for i in range(len(values)):
             f = []
             try:
-                f.append(float(values[i]))
+                x = float(values[i])
+                if reciprocal:
+                    x = 1/x
+                f.append(x)
             except ValueError as e:
                 logger.err('Row ' + str(row_index) + " Col " + columns[i].name + " has an invalid value: " + str(values[i]) )
+
             pltxt = cc.MakeCKKSPackedPlaintext(f)
             enc = cc.Encrypt(pk, pltxt)
             ciphertexts.append(enc)    

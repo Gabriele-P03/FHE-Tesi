@@ -16,7 +16,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 
 def view(req: Packet, res: Packet, rsa: RSA):
-    if req.op == OPERATIONS.SCREEN.value:
+    if req.op in [OPERATIONS.SCREEN.value, OPERATIONS.AVG.value, OPERATIONS.STD.value]:
         logger.info("Printing Current Cyphertext")
         data = json.loads(res.data)
         logger.dbg(f'Dec {len(res.data)} bytes of ciphertext')

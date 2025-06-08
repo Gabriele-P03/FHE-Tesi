@@ -199,7 +199,16 @@ class OPERATIONS(Enum):
         Parameter[str]('uri', True, str),
         Parameter[str]('columns', False, str)
     ])
-    BST = 5, Operation('bootstrap', [
+
+    AVG = 7, Operation('avg', [
+        Parameter[str]('columns', False, str)
+    ])
+
+    STD = 8, Operation('std', [
+        Parameter[str]('columns', False, str)
+    ])
+
+    BST = 9, Operation('bootstrap', [
     ])
     
 

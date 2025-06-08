@@ -34,12 +34,12 @@ def load(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     except FileExistsError as e:
         return ERRORS.DATASET_NOTFOUND
     
-def createDataset(uri: str, fhe: FHE):
+def createDataset(uri: str, fhe: FHE, reciprocal=False):
     logger.info("Loading " + uri + " dataset")
     stream = path_utils.getDataset(uri)
     name, format = getNameAndFormatByPath(uri)
     dataset = Dataset(name, format, []) 
-    dataset.load(stream, fhe=fhe) 
+    dataset.load(stream, fhe, reciprocal) 
     l = dataset.size
     if l == 0:
         logger.warn("It seems like " + uri + " is an empty dataset")

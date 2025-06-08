@@ -50,9 +50,9 @@ class Dataset:
     def columns(self):
         return self.__columns
 
-    def load(self, stream, fhe: FHE):
+    def load(self, stream, fhe: FHE, reciprocal=False):
         if self.__type == DATASETTYPES.CSV:
-            self.__columns, self.__data = load_csv(stream, fhe)
+            self.__columns, self.__data = load_csv(stream, fhe, reciprocal=reciprocal)
 
     def hasColumn(self, name: str):
         for c in self.columns:
