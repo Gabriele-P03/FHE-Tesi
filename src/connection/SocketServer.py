@@ -12,7 +12,8 @@ from utils import pk_exchange
 from utils import socket_utils
 
 
-from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import hashes
 
 sys.path.append('../comunication')
 from comunication.dispatcher.dispatcher import Dispatcher
@@ -37,9 +38,13 @@ class SocketServer(socketserver.BaseRequestHandler):
     def handle(self):
         logger.info("Connection enstabilished with " + self.client_address[0])
         self.fhe = FHE()
-        self.__pk = pk_exchange.exchange(self.request, self.fhe.publicKey)
-        self.fhe.setPK(self.__pk)
-        self.__connected = True
+        rsa_pub_str = self.fhe.rsaPublicKeyStr
+        client_enc_aes_key = pk_exchange.exchange(self.request, rsa_pub_str)
+        self.__pk = self.fhe.rsaPrivateKey.decrypt(client_enc_aes_key, padding.OAEP(
+                                                                            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                                                                            algorithm=hashes.SHA256(),
+                                                                            label=None)
+    )
         self.__dispatcher = Dispatcher()
 
         self.loop()

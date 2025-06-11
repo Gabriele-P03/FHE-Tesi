@@ -12,6 +12,7 @@ sys.path.append('../exception')
 from exception import call_exception
 
 from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
 
 from Crypto.Cipher import AES
 
@@ -25,7 +26,9 @@ class FHE:
     __secret_key: PrivateKey
     __public_key: PublicKey
 
-    __pk: rsa.RSAPublicKey
+    __rsa_public_key_str: str
+    __rsa_public_key: rsa.RSAPublicKey
+    __rsa_private_key: rsa.RSAPrivateKey
 
     level_budget=[4,4]
     bsgs_dim=[0,0]
@@ -84,6 +87,8 @@ class FHE:
         flagGenKey = self.__config['custom_keys']
         sk_file_path = 'private_server.pem'
         pk_file_path = 'public_server.pem'
+        rsa_public_path = 'rsa_public_server.pem'
+        rsa_private_path = 'rsa_private_server.pem'
         self.cc.EvalBootstrapSetup(self.level_budget)
         if flagGenKey:
             logger.info(f'Reading Secret Key from {sk_file_path}')
@@ -92,7 +97,6 @@ class FHE:
             logger.info(f'Reading Public Key from {pk_file_path}')
             pk_str = readResourceFile(pk_file_path, mode='rb')
             self.__public_key = DeserializePublicKeyString(pk_str, BINARY)
-            self.__context
         else:
             logger.info("Generating Keys...")
             keys = self.__context.KeyGen()
@@ -103,6 +107,15 @@ class FHE:
                 saveFile(pk_file_path, Serialize(self.__public_key, BINARY), mode='wb')
                 logger.info(f'Storing Secret Key in {sk_file_path}')
                 saveFile(sk_file_path, Serialize(self.__secret_key, BINARY), mode='wb')
+
+        logger.info(f'Reading RSA Private Key {rsa_private_path}')
+        rsa_private_str = readResourceFile(rsa_private_path, mode='rb')
+        rsa_public_str = readResourceFile(rsa_public_path, mode='rb')
+        self.__rsa_public_key_str = rsa_public_str
+        self.__rsa_private_key = serialization.load_pem_private_key(rsa_private_str, password=None)
+        logger.info(f'Reading RSA Public Key {rsa_private_path}')
+        self.__rsa_public_key = serialization.load_pem_public_key(rsa_public_str)
+
         logger.info("Evaluating MultKeyGen...")
         
         ring_dim = self.cc.GetRingDimension()
@@ -115,12 +128,16 @@ class FHE:
     def publicKey(self) -> PublicKey:
         return self.__public_key
     
-    def setPK(self, _pk: rsa.RSAPublicKey):
-        self.__pk = _pk
 
     @property
-    def pk(self) -> rsa.RSAPublicKey:
-        return self.__pk
+    def rsaPublicKey(self) -> rsa.RSAPublicKey:
+        return self.__rsa_public_key
+    @property
+    def rsaPublicKeyStr(self) -> str:
+        return self.__rsa_public_key_str
+    @property
+    def rsaPrivateKey(self) -> rsa.RSAPrivateKey:
+        return self.__rsa_private_key
     
     @property
     def secretKey(self) -> PrivateKey:

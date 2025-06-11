@@ -1,3 +1,13 @@
+'''
+
+In this file ad hoc will be performed ke- exchanging-steps between two end-points
+
+Server sends its rsa public key (a) to client
+Client sends its aes key (e) already encrypted via a
+Server decrypts enc e with its rsa private key  
+
+'''
+
 import sys
 
 sys.path.append('../parameters')
@@ -10,29 +20,31 @@ sys.path.append('../exception')
 from exception import key_exception
 
 from utils.socket_utils import recv, send
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 
-def exchange(__socket, pk):
+
+
+def exchange(__socket, key: bytes):
     logger.info("Exchanging PK...")
-    if INSTANCE.port.assigned:
-        pk = __receive(__socket)
-        return pk
+    if INSTANCE.port.assigned:#Server side
+
+        logger.info(f'Sending RSA Public Key: {len(key)} bytes')
+        send(__socket, key)
+        logger.info("Waiting for Client's AES Key")
+        client_aes_enc, server_pk_size = recv(__socket)
+        return client_aes_enc
     else:
-        __send(__socket, pk)
+        logger.info("Waiting for Server's RSA Public Key")
+        server_pk, server_pk_size = recv(__socket)
+        server_pk = serialization.load_pem_public_key(server_pk)
+        logger.info("Sending Encrypted AES Key")
+        enc_aes = server_pk.encrypt(key, padding.OAEP(
+                                                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                                                algorithm=hashes.SHA256(),
+                                                label=None)
+    )
+        send(__socket, enc_aes)
         return None
-    
-
-def __receive(__socket) ->  rsa.RSAPublicKey:
-    p, p_size = recv(__socket)
-    logger.info(f'Received {p_size} bytes of Client\'s PK')
-    pk = serialization.load_pem_public_key(p)
-    if not isinstance(pk, rsa.RSAPublicKey):
-        raise key_exception.KeyException("It seems like received Client's Public Key is not valid")
-    return pk
-
-def __send(__socket, pk):
-    logger.info(f'Sending {len(pk)} + bytes of PK.')
-    pk = bytes(pk, encoding='utf8')
-    send(__socket, pk)
 

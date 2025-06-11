@@ -6,7 +6,7 @@ sys.path.append('../parameters')
 from parameters.parameters import INSTANCE
 
 sys.path.append('../fhe')
-from sec.rsa import RSA
+from sec.aes import AES
 
 sys.path.append('../utils')
 from utils import pk_exchange, socket_utils
@@ -19,7 +19,7 @@ from comunication.producer.viewer import view
 class SocketClient:
 
     __socket = None
-    __rsa: RSA = None
+    __aes: AES = None
     __producer: Producer = None
 
     def __init__(self):
@@ -28,8 +28,8 @@ class SocketClient:
         self.__socket.connect( (INSTANCE.server_ip.value, INSTANCE.server_port.value) )
         logger.info("Client connected to " + str(INSTANCE.server_ip.value) + ":" + str(INSTANCE.server_port.value))
 
-        self.__rsa = RSA()
-        pk_exchange.exchange(self.__socket, self.__rsa.publicKeyRaw)
+        self.__aes = AES()
+        pk_exchange.exchange(self.__socket, bytes(self.__aes.aesKeyStr, encoding='utf8'))
 
         self.__producer = Producer()
     
@@ -45,7 +45,7 @@ class SocketClient:
                 data, size = socket_utils.recv(self.__socket)
                 packet: Packet = Packet(_json=str(data, encoding='utf8'))
                 logger.info('Request: ' + str(p.op) + ' -> ' + str(packet.status) + ': ' + packet.msg)
-                view(p, packet, self.__rsa)
+                view(p, packet, self.__aes)
 
                 
     def close(self):

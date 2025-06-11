@@ -5,7 +5,7 @@ from comunication.packet import Packet
 from comunication.operations import OPERATIONS
 
 sys.path.append('../../sec')
-from sec.rsa import RSA 
+from sec.aes import AES 
 
 sys.path.append('../../logger')
 from logger import logger
@@ -15,7 +15,7 @@ import json
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 
-def view(req: Packet, res: Packet, rsa: RSA):
+def view(req: Packet, res: Packet, aes: AES):
     if req.op in [OPERATIONS.SCREEN.value, OPERATIONS.AVG.value, OPERATIONS.STD.value]:
         logger.info("Printing Current Cyphertext")
         data = json.loads(res.data)
