@@ -67,11 +67,19 @@ class Dataset:
         Each single ciphertext must be decrypted bu client
     """
     def toJson(self, fhe: FHE):
-        js = []
+        js = {}
+        js_cols = []
+        columns_name = map(lambda x: x.name, self.columns)
+        for n in columns_name:
+            js_cols.append(n)
+        js_data = []
         for row in self.__data:
             js_row = []
             for val in row:
                 b = fhe.cc.Decrypt(fhe.secretKey, val).GetCKKSPackedValue()[0].real
                 js_row.append(str(b))  #Appending ciphertext
-            js.append(js_row)
+            js_data.append(js_row)
+
+        js["columns"] = js_cols
+        js["data"]= js_data
         return js

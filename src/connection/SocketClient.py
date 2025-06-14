@@ -16,6 +16,8 @@ from comunication.producer.producer import Producer, Packet
 from comunication.operations import OPERATIONS
 from comunication.producer.viewer import view 
 
+from Crypto.Util.Padding import unpad
+
 class SocketClient:
 
     __socket = None
@@ -43,6 +45,8 @@ class SocketClient:
                     logger.info('Exiting...')
                     exit(1)
                 data, size = socket_utils.recv(self.__socket)
+                data = self.__aes.cipher.decrypt(data)
+                data = unpad(data, 32)
                 packet: Packet = Packet(_json=str(data, encoding='utf8'))
                 logger.info('Request: ' + str(p.op) + ' -> ' + str(packet.status) + ': ' + packet.msg)
                 view(p, packet, self.__aes)
