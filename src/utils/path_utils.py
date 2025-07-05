@@ -1,16 +1,18 @@
 import os
 import sys
 
+import re
+
 sys.path.append('../exception')
 
 from exception import command_exception
 
 def getDataset(file: str):
-    if '..' in file or '/' in file or not file.endswith('.csv'):
+    if re.fullmatch('[a-zA-Z0-9_]+\.csv', file):
         raise command_exception.CommandException("Path " + file + " is not valid")
     
     execPath = os.path.dirname(__file__)
-    execPath += '/../../resources/'+file
+    execPath += '/../../dataset/'+file
     return open(execPath, 'r')
     
 def readResourceFile(path: str, size: int = -1, mode: str = 'r') -> str:
