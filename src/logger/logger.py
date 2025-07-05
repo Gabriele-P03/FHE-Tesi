@@ -3,6 +3,9 @@ from enum import Enum
 import traceback
 from sys import gettrace as sys_gettrace
 
+file_name = str(dt.datetime.now()).replace(' ', '_')
+log_file = open('logs/'+file_name+'.txt', 'w+')
+
 #DEBUG is true if debugger is attached
 DEBUG = sys_gettrace() is not None
 
@@ -37,6 +40,7 @@ def log(logtype: LOGTYPE, msg: str):
     ts = _getCurrentTimestamp()
     ts = "[ " + ts + " ]: "
     print(color + ts + msg)
+    log_file.write(ts + msg + '\n')
 
 def info(msg: str):
     log(LOGTYPE.INFO, msg)

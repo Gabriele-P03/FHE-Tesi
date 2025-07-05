@@ -4,24 +4,20 @@ In this python file there will be defined loader functions for each dataset type
 
 '''
 
-import openpyxl.workbook
+from parameters.parameters import INSTANCE
 from dataset.column import Column
-from openfhe import Ciphertext
 
 import sys
 sys.path.append('../fhe')
 from sec.fhe import FHE
 
-sys.path.append('../comunication')
-from comunication.errors import ERRORS
-
 sys.path.append('../logger')
 from logger import logger
 
 import psutil
-from openpyxl import Workbook, load_workbook
+from openpyxl import Workbook
+import datetime
 
-#wb = load_workbook('test.xlsx')
 wb = Workbook()
 ws = wb.active
 
@@ -58,7 +54,13 @@ def load_csv(stream, fhe: FHE, separator = ';', reciprocal=False):
         data.append(ciphertexts)
         
         ws.append([row_index, pre, ps.memory_info().rss])
-    wb.save('test.xlsx')    
+
+    file_name = 'test_'+str(datetime.datetime.now())+'_'
+    if INSTANCE.port.assigned:
+        file_name += 's'
+    else:
+        file_name = 'c'
+    wb.save('test\\'+file_name+'.xlsx')    
     return columns, data
 
 import math
