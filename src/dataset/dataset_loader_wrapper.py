@@ -30,6 +30,8 @@ def load_csv(stream, fhe: FHE, separator = ';', reciprocal=False):
     pk = fhe.publicKey
     row_index = 0
     ps = pre = psutil.Process()
+    dt = datetime.datetime.now()
+    ws.append([str(dt)])
     for line in stream:
         pre = ps.memory_info().rss
         row_index += 1
@@ -60,7 +62,8 @@ def load_csv(stream, fhe: FHE, separator = ';', reciprocal=False):
         file_name += 's'
     else:
         file_name = 'c'
-    wb.save('test\\'+file_name+'.xlsx')    
+    ws.append([str(datetime.datetime.now())])
+    wb.save('/home/gabrielepace_std/FHE-Tesi/test/'+file_name+'.xlsx')    
     return columns, data
 
 import math
