@@ -36,6 +36,8 @@ def route(packet: Packet, dispatcher, fhe: FHE) -> Union[ERRORS, bytes]:
             err, data = std_wrapper.std(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.BST.value:
             err = bootstrap_wrapper.bootstrap(packet.toOperation(), dispatcher, fhe)
+        case OPERATIONS.DEL.value:
+            
         case OPERATIONS.SCREEN.value:
             err, data = screen_wrapper.screen(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.CLOSE.value:

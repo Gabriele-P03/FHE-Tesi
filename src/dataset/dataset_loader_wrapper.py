@@ -25,16 +25,17 @@ def load_csv(stream, fhe: FHE, separator = ';', reciprocal=False):
     headers_str: str = stream.readline()
     headers_str_splitted = headers_str.split(separator)
     columns = [ Column(c) for c in headers_str_splitted ]
+    logger.info(f'Loading {len(columns)} columns')
     data = []
     cc = fhe.cc
     pk = fhe.publicKey
-    row_index = 0
-    ps = pre = psutil.Process()
-    dt = datetime.datetime.now()
-    ws.append([str(dt)])
+    #row_index = 0
+    #ps = pre = psutil.Process()
+    #dt = datetime.datetime.now()
+    #ws.append([str(dt)])
     for line in stream:
-        pre = ps.memory_info().rss
-        row_index += 1
+        #pre = ps.memory_info().rss
+        #row_index += 1
         #Parsing single line
         values = line.split(separator)#Splitting values
         ciphertexts = []
@@ -55,15 +56,15 @@ def load_csv(stream, fhe: FHE, separator = ';', reciprocal=False):
             ciphertexts.append(enc)    
         data.append(ciphertexts)
         
-        ws.append([row_index, pre, ps.memory_info().rss])
+    #    ws.append([row_index, pre, ps.memory_info().rss])
 
-    file_name = 'test_'+str(datetime.datetime.now())+'_'
-    if INSTANCE.port.assigned:
-        file_name += 's'
-    else:
-        file_name = 'c'
-    ws.append([str(datetime.datetime.now())])
-    wb.save('/home/gabrielepace_std/FHE-Tesi/test/'+file_name+'.xlsx')    
+    #file_name = 'test_'+str(datetime.datetime.now())+'_'
+    #if INSTANCE.port.assigned:
+    #    file_name += 's'
+    #else:
+    #    file_name = 'c'
+    #ws.append([str(datetime.datetime.now())])
+    #wb.save('/home/gabrielepace_std/FHE-Tesi/test/'+file_name+'.xlsx')    
     return columns, data
 
 import math

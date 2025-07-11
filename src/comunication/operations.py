@@ -210,6 +210,11 @@ class OPERATIONS(Enum):
 
     BST = 9, Operation('bootstrap', [
     ])
+
+    DEL = 10, Operation('del', [
+        Parameter[str]('rows', False, str)
+        Parameter[str]('columns', False, str)
+    ])
     
 
     SCREEN = 995, Operation(
