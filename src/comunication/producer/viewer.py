@@ -38,3 +38,8 @@ def view(req: Packet, res: Packet, aes: AES):
                     print(', ', end='')
             print()
         print("---------------------------------------------------------------------------")
+
+    elif req.op == OPERATIONS.DIR.value:
+        data = json.loads(res.data)
+        for f in data:
+            print(f)

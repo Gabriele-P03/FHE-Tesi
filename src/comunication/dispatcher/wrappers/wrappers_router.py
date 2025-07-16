@@ -1,5 +1,6 @@
 import sys
-from . import loader_wrapper, sum_wrapper, screen_wrapper, mul_wrapper, sub_wrapper, bootstrap_wrapper, avg_wrapper, div_wrapper, std_wrapper
+from . import loader_wrapper, sum_wrapper, screen_wrapper, mul_wrapper, sub_wrapper, bootstrap_wrapper, avg_wrapper, div_wrapper
+from . import std_wrapper, del_wrapper, dir_wrapper
 
 sys.path.append('../../')
 from comunication.packet import Packet 
@@ -23,7 +24,7 @@ def route(packet: Packet, dispatcher, fhe: FHE) -> Union[ERRORS, bytes]:
         case OPERATIONS.UNLOAD.value:
             err = loader_wrapper.unload(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.SUM.value:
-            err = sum_wrapper.sum(packet.toOperation(), dispatcher, fhe)
+            err, data = sum_wrapper.sum(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.MUL.value:
             err = mul_wrapper.mul(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.SUB.value:
@@ -37,7 +38,9 @@ def route(packet: Packet, dispatcher, fhe: FHE) -> Union[ERRORS, bytes]:
         case OPERATIONS.BST.value:
             err = bootstrap_wrapper.bootstrap(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.DEL.value:
-            
+            err, data = del_wrapper.delete(packet.toOperation(), dispatcher, fhe)
+        case OPERATIONS.DIR.value:
+            err, data = dir_wrapper.dir(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.SCREEN.value:
             err, data = screen_wrapper.screen(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.CLOSE.value:

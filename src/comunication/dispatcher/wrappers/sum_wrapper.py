@@ -25,7 +25,7 @@ from exception.dataset_exception import DatasetException
 
 def sum(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     if dispatcher.data is None:
-        return ERRORS.NO_DATASET_LOADED
+        return ERRORS.NO_DATASET_LOADED, ''
     try:
         uri = op.getParameterValue('uri')
         dataset = loader_wrapper.createDataset(uri, fhe=fhe)   #Loaded dataset to sum
@@ -37,7 +37,12 @@ def sum(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
             cols = cols.split(';')
         except CommandException:
             cols = list( map(lambda x: x.name, dataset.columns) )
-        ext_indeces = dataset_utils.match_indices_cols(columns, cols, dataset)
+
+        try:
+            ext_indeces = dataset_utils.match_indices_cols(columns, cols, dataset)
+        except DatasetException as e:
+            return ERRORS.DATASET_COLUMN_NOT_PRESENT, str(e)
+         
         logger.info(f'Summing {uri} dataset by columns: {cols}. Indeces Linkage: {ext_indeces}')
         
 
@@ -51,8 +56,8 @@ def sum(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
                 c = fhe.cc.EvalAdd(c, c1)
                 loaded_dataset[i1][j] = c
         
-        return ERRORS.OK
+        return ERRORS.OK, ''
     except DatasetException as e:
-        return ERRORS.DATASET_COLUMN_NOT_PRESENT
+        return ERRORS.DATASET_COLUMN_NOT_PRESENT, ''
     except FileExistsError as e:
-        return ERRORS.DATASET_NOTFOUND
+        return ERRORS.DATASET_NOTFOUND, ''

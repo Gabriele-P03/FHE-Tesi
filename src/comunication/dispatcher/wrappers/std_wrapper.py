@@ -35,6 +35,7 @@ import json
 
 
 def std(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
+    logger.info("Executing Standard Deviation")
     if dispatcher.data is None:
         return ERRORS.NO_DATASET_LOADED
     try:

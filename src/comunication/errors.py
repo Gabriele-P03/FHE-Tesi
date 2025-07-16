@@ -12,6 +12,9 @@ class ERRORS(Enum):
     NO_DATASET_LOADED = 4
     DATASET_CORRUPTED = 5
     DATASET_COLUMN_NOT_PRESENT = 6
+    PARAMETER_ERROR = 7
+    PARAMETER_VALUE_ERROR = 8
+
 
 
 def getMessageErrorByIndex(er: int):
@@ -30,3 +33,7 @@ def getMessageErrorByIndex(er: int):
             return 'There\'s an invalid value in the selected dataset'
         case ERRORS.DATASET_COLUMN_NOT_PRESENT.value:
             return 'There are some columns which are not present in the laoded dataset'
+        case ERRORS.PARAMETER_ERROR.value:
+            return 'Parameter flow is not valid'
+        case ERRORS.PARAMETER_VALUE_ERROR.value:
+            return 'Parameter\'s value is not valid'

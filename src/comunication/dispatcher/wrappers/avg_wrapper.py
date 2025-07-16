@@ -26,6 +26,7 @@ import json
 
 
 def avg(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
+    logger.info("Executing average")
     if dispatcher.data is None:
         return ERRORS.NO_DATASET_LOADED
     try:

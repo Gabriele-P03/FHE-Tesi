@@ -131,17 +131,18 @@ class Parameters:
         for par in self.__mapper:
             if par[0:1] == param:
                 parameter = self.__mapper[par]
-                logger.dbg(f'Found {parameter} at {par[0:1]}')
                 valuable = parameter.valuable
                 value = True
                 if valuable:
+                    if i+1 >= len(s.argv):
+                        raise RuntimeError(f'Parameter {param} must be valorized')   
                     value = s.argv[i+1]
 
                 self.__checkParameter(parameter, value)
 
                 return valuable
         
-        return False
+        raise RuntimeError(f'Parameter {param} does not exists')
 
     def __checkParameter(self, parameter: Parameter, value: str):
         parameter.invokeConvertMethod(value) 

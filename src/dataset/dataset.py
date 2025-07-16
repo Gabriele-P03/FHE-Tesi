@@ -46,6 +46,9 @@ class Dataset:
     def data(self):
         return self.__data
     
+    def set_data(self, data):
+        self.__data = data
+    
     @property
     def columns(self):
         return self.__columns
@@ -59,6 +62,13 @@ class Dataset:
             if c.name == name:
                 return
         raise RuntimeError(f'Dataset {self.name} does not contain any {name} column')
+    
+    def getIndexColumn(self, name:str) -> int:
+        for i in range(0, len(self.columns)):
+            c = self.columns[i]
+            if c.name == name:
+                return i
+        raise DatasetException(f'Column {name} does not exists')
 
     """
         Return the whole dataset as a json array

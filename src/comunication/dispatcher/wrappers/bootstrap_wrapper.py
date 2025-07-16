@@ -24,6 +24,7 @@ from exception.dataset_exception import DatasetException
 
 
 def bootstrap(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
+    logger.info("Executing bootstrap")
     if dispatcher.data is None:
         return ERRORS.NO_DATASET_LOADED
     

@@ -149,7 +149,7 @@ class Operation:
         for i in range(0, len(self.__parameters)):
             par = self.__parameters[i]
             if par.valorized:
-                if i > 0 and i < len(self.__parameters):
+                if i > 0 and i < (len(self.__parameters)-1):
                     buffer += ','
                 buffer += '{' + par.data() + '}'
         buffer += "]"
@@ -212,8 +212,11 @@ class OPERATIONS(Enum):
     ])
 
     DEL = 10, Operation('del', [
-        Parameter[str]('rows', False, str)
+        Parameter[str]('rows', False, str),
         Parameter[str]('columns', False, str)
+    ])
+
+    DIR = 11, Operation('dir', [
     ])
     
 

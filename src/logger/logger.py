@@ -52,7 +52,7 @@ def err(msg: str):
     log(LOGTYPE.ERR, msg)
 
 def dbg(msg: str):
-    if DEBUG:
+    if not DEBUG:
         msg = "!!! DEBUGGER IS NOT ATTACHED !!!"    
     log(LOGTYPE.DBG, msg)
 

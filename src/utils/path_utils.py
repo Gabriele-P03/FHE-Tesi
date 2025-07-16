@@ -7,6 +7,12 @@ sys.path.append('../exception')
 
 from exception import command_exception
 
+def listDataset():
+    execPath = os.path.dirname(__file__)
+    execPath += '/../../dataset/'
+    files = os.listdir(execPath)
+    return files
+
 def getDataset(file: str):
     if not re.fullmatch(r'^[a-zA-Z0-9_]+\.csv$', file):
         raise command_exception.CommandException("Path " + file + " is not valid")

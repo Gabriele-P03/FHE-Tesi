@@ -39,7 +39,7 @@ def load_csv(stream, fhe: FHE, separator = ';', reciprocal=False):
         #Parsing single line
         values = line.split(separator)#Splitting values
         ciphertexts = []
-        print(str(row_index))
+        #print(str(row_index))
         for i in range(len(values)):
             f = []
             try:
