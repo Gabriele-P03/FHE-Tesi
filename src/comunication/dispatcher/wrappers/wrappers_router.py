@@ -1,6 +1,6 @@
 import sys
 from . import loader_wrapper, sum_wrapper, screen_wrapper, mul_wrapper, sub_wrapper, bootstrap_wrapper, avg_wrapper, div_wrapper
-from . import std_wrapper, del_wrapper, dir_wrapper
+from . import std_wrapper, del_wrapper, dir_wrapper, thumbnail_wrapper
 
 sys.path.append('../../')
 from comunication.packet import Packet 
@@ -41,6 +41,8 @@ def route(packet: Packet, dispatcher, fhe: FHE) -> Union[ERRORS, bytes]:
             err, data = del_wrapper.delete(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.DIR.value:
             err, data = dir_wrapper.dir(packet.toOperation(), dispatcher, fhe)
+        case OPERATIONS.THN.value:
+            err, data = thumbnail_wrapper.thumbnail(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.SCREEN.value:
             err, data = screen_wrapper.screen(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.CLOSE.value:

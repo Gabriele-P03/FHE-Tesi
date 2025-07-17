@@ -43,3 +43,16 @@ def view(req: Packet, res: Packet, aes: AES):
         data = json.loads(res.data)
         for f in data:
             print(f)
+    elif req.op == OPERATIONS.THN.value:
+        data = json.loads(res.data)
+        print("---------------------------------------------------------------------------")
+        print("Columns Size: " + str(data["Columns Size"]))
+        cols = data["Columns"]
+        for i in range(0, len(cols)):
+            c = cols[i]
+            print(c, end='')
+            if i < len(cols)-1:
+                print(', ', end='')
+        print("\n")
+        print("Row Size: " + str(data["Row Size"]))
+        print("---------------------------------------------------------------------------")

@@ -40,13 +40,24 @@ def std(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
         return ERRORS.NO_DATASET_LOADED
     try:
         dataset = dispatcher.data.data
-        cols_size = len(dispatcher.data.columns)
         row_size = dispatcher.data.size
         row_size_cpt = fhe.cc.Encrypt(fhe.publicKey, fhe.cc.MakeCKKSPackedPlaintext([1/row_size])) #Row size as ciphertext
 
+        columns = [x.name for x in dispatcher.data.columns]
+        try:
+            cols = op.getParameterValue('columns').strip()
+            cols = cols.split(';')
+        except CommandException:
+            cols = list( map(lambda x: x.name, dataset.columns) )
+
+        try:
+            ext_indeces = dataset_utils.match_indices_cols(columns, cols, dataset)
+        except DatasetException as e:
+            return ERRORS.DATASET_COLUMN_NOT_PRESENT, str(e)
+
         buffer = [] #This array will contain deviation standard
 
-        for j in range(0,cols_size):
+        for j in ext_indeces:
             #j is the col in loaded dataset, therefore it is going to calculate std for each column
             ciphertext_buffer = None
             for i1 in range(0,row_size):

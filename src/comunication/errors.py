@@ -28,7 +28,7 @@ def getMessageErrorByIndex(er: int):
         case ERRORS.DATASET_ALREADY_LOADED.value:
             return 'There\'s already a dataset loaded. Close it before'
         case ERRORS.NO_DATASET_LOADED.value:
-            return 'There\'s no dataset to unload'
+            return 'There\'s no loaded dataset'
         case ERRORS.DATASET_CORRUPTED.value:
             return 'There\'s an invalid value in the selected dataset'
         case ERRORS.DATASET_COLUMN_NOT_PRESENT.value:

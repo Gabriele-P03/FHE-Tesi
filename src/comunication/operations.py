@@ -218,6 +218,10 @@ class OPERATIONS(Enum):
 
     DIR = 11, Operation('dir', [
     ])
+
+    THN = 12, Operation('thn', [
+        Parameter[str]('uri', False, str)
+    ]) 
     
 
     SCREEN = 995, Operation(

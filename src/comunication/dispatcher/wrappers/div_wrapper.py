@@ -41,9 +41,12 @@ def div(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
             cols = cols.split(';')
         except CommandException:
             cols = list( map(lambda x: x.name, dataset.columns) )
-        ext_indeces = dataset_utils.match_indices_cols(columns, cols, dataset)
-        logger.info(f'Division {uri} dataset by columns: {cols}. Indeces Linkage: {ext_indeces}')
         
+        try:
+            ext_indeces = dataset_utils.match_indices_cols(columns, cols, dataset)
+        except DatasetException as e:
+            return ERRORS.DATASET_COLUMN_NOT_PRESENT, str(e)
+        logger.info(f'Division {uri} dataset by columns: {cols}. Indeces Linkage: {ext_indeces}')
 
         loaded_dataset = dispatcher.data.data
         loaded_row_size = dispatcher.data.size

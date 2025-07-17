@@ -49,7 +49,8 @@ class SocketClient:
                 data = unpad(data, 32)
                 packet: Packet = Packet(_json=str(data, encoding='utf8'))
                 logger.info('Request: ' + str(p.op) + ' -> ' + str(packet.status) + ': ' + packet.msg)
-                view(p, packet, self.__aes)
+                if packet.status == 0:
+                    view(p, packet, self.__aes)
 
                 
     def close(self):
