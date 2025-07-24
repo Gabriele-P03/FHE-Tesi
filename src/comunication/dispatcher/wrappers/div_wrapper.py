@@ -47,7 +47,7 @@ def div(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
         except DatasetException as e:
             return ERRORS.DATASET_COLUMN_NOT_PRESENT, str(e)
         logger.info(f'Division {uri} dataset by columns: {cols}. Indeces Linkage: {ext_indeces}')
-
+    
         loaded_dataset = dispatcher.data.data
         loaded_row_size = dispatcher.data.size
         for j in ext_indeces:

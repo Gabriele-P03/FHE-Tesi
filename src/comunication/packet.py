@@ -91,6 +91,7 @@ class Packet:
     def toOperation(self) -> operations.Operation:
         o: operations.OPERATIONS = operations.getOperationByIndex(self.op)
         operation = o.operation.__copy__()
+        print(self.data)
         parametersJsonArray = json.loads(self.data)
         for par in parametersJsonArray:
             for key in par:

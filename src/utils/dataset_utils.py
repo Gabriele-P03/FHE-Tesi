@@ -1,7 +1,36 @@
 import sys
 
 sys.path.append('../')
-from exception import dataset_exception
+from exception import dataset_exception, command_exception
+
+sys.path.append('../')
+from comunication.operations import Operation, OPERATIONS 
+
+import re
+
+def parseRowIndices(op: Operation) -> [int]:
+    try:
+        raw_rows = op.getParameterValue("uri")
+    except command_exception.CommandException as e:
+        return 
+    if re.match(r"^[0-9]+:[0-9]+$"):    #Range indices start:end
+        splitted = raw_rows.split(":")
+        try:
+            start = int(splitted[0])
+            end = int(splitted[1])
+            return range(start, end+1)  #end+1 since end is exclusive
+        except ValueError:
+            raise command_exception.CommandException(f'{raw_rows} is not a valid row indices range')
+    else:   #Range as csv
+        splitted = raw_rows.split(";")
+        rows = []
+        for c in splitted:
+            try:
+                i = int(c)
+            except ValueError:
+                raise command_exception.CommandException(f'{c} is not a valid row index')
+            rows.append(i)
+        return rows
 
 def match_indices_cols(cols1, cols2, dataset):
     if len(cols2) <= 0:

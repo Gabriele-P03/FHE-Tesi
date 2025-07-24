@@ -14,7 +14,7 @@ from comunication.operations import Operation, OPERATIONS
 from comunication.errors import ERRORS
 
 sys.path.append('../../../utils')
-from utils import path_utils
+from utils import path_utils, dataset_utils
 
 sys.path.append('../../../dataset')
 from dataset.dataset import Dataset
@@ -29,17 +29,21 @@ def load(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     if dispatcher.data is not None:
         return ERRORS.DATASET_ALREADY_LOADED
     try:
-        dispatcher.data = createDataset(op.getParameterValue('uri'), fhe)
+        dispatcher.data = createDataset(op, fhe)
         return ERRORS.OK
     except FileExistsError as e:
         return ERRORS.DATASET_NOTFOUND
     
-def createDataset(uri: str, fhe: FHE, reciprocal=False):
+def createDataset(op: Operation, fhe: FHE, reciprocal=False):
+    uri = op.getParameterValue('uri')
     logger.info("Loading " + uri + " dataset")
+
+    rows = dataset_utils.parseRowIndices(op)
+
     stream = path_utils.getDataset(uri)
     name, format = getNameAndFormatByPath(uri)
     dataset = Dataset(name, format, []) 
-    dataset.load(stream, fhe, reciprocal) 
+    dataset.load(stream, fhe, reciprocal, rows=rows) 
     l = dataset.size
     if l == 0:
         logger.warn("It seems like " + uri + " is an empty dataset")

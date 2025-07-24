@@ -21,7 +21,7 @@ import datetime
 wb = Workbook()
 ws = wb.active
 
-def load_csv(stream, fhe: FHE, separator = ';', reciprocal=False):
+def load_csv(stream, fhe: FHE, separator = ';', reciprocal=False, rows=[], cols=[]):
     headers_str: str = stream.readline()
     headers_str_splitted = headers_str.split(separator)
     columns = [ Column(c) for c in headers_str_splitted ]
@@ -29,17 +29,21 @@ def load_csv(stream, fhe: FHE, separator = ';', reciprocal=False):
     data = []
     cc = fhe.cc
     pk = fhe.publicKey
-    #row_index = 0
+    row_index = 0
+    rows_size = len(rows)
     #ps = pre = psutil.Process()
     #dt = datetime.datetime.now()
     #ws.append([str(dt)])
     for line in stream:
         #pre = ps.memory_info().rss
-        #row_index += 1
+        row_index += 1
+        if rows_size > 0:
+            if row_index not in rows:
+                continue
         #Parsing single line
         values = line.split(separator)#Splitting values
         ciphertexts = []
-        #print(str(row_index))
+        print(str(row_index))
         for i in range(len(values)):
             f = []
             try:

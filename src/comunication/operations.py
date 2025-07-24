@@ -175,7 +175,8 @@ class OPERATIONS(Enum):
         return self.__operation
 
     LOAD = 1, Operation('load', [
-        Parameter[str]('uri', True, str)
+        Parameter[str]('uri', True, str),
+        Parameter[str]('rows', False, str)
     ])
     
     UNLOAD = 2, Operation('unload', [])
