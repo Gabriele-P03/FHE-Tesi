@@ -10,10 +10,10 @@ import re
 
 def parseRowIndices(op: Operation) -> [int]:
     try:
-        raw_rows = op.getParameterValue("uri")
+        raw_rows = op.getParameterValue("rows")
     except command_exception.CommandException as e:
-        return 
-    if re.match(r"^[0-9]+:[0-9]+$"):    #Range indices start:end
+        return []
+    if re.match(r"^[0-9]+:[0-9]+$", raw_rows):    #Range indices start:end
         splitted = raw_rows.split(":")
         try:
             start = int(splitted[0])
@@ -53,4 +53,4 @@ def match_indices_cols(cols1, cols2, dataset):
 
         if not flag:
             raise dataset_exception.DatasetException(f'It seems like loaded dataset does not contain {c2} column')
-    return 
+    return indices

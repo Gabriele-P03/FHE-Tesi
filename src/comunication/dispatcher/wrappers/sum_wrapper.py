@@ -27,8 +27,7 @@ def sum(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     if dispatcher.data is None:
         return ERRORS.NO_DATASET_LOADED, ''
     try:
-        uri = op.getParameterValue('uri')
-        dataset = loader_wrapper.createDataset(uri, fhe=fhe)   #Loaded dataset to sum
+        dataset, rows = loader_wrapper.createDataset(op, fhe=fhe)   #Loaded dataset to sum
 
         columns = [x.name for x in dispatcher.data.columns]
 
@@ -43,14 +42,14 @@ def sum(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
         except DatasetException as e:
             return ERRORS.DATASET_COLUMN_NOT_PRESENT, str(e)
          
-        logger.info(f'Summing {uri} dataset by columns: {cols}. Indeces Linkage: {ext_indeces}')
+        logger.info(f'Summing {op.getParameterValue("uri")} dataset by columns: {cols}. Indeces Linkage: {ext_indeces}')
         
 
         loaded_dataset = dispatcher.data.data
         loaded_row_size = dispatcher.data.size
         for j in ext_indeces:
             #j is the col in loaded dataset
-            for i1 in range(0,loaded_row_size):
+            for i1 in rows:
                 c = loaded_dataset[i1][j]
                 c1 = dataset.data[i1][ext_indeces[j]]
                 c = fhe.cc.EvalAdd(c, c1)

@@ -40,6 +40,10 @@ class Parameter(Generic[T]):
         self.__value = self.__cast_function(value)
         self.__valorized = True
 
+    def resetToModel(self):
+        self.__value = None
+        self.__valorized = False
+
     @property
     def value(self):
         return self.__value    
@@ -80,6 +84,11 @@ class Operation:
     def __init__(self, _name: str, _parameters: List[Parameter] = []):
         self.__name = _name
         self.__parameters = _parameters
+
+    def resetToModel(self):
+        self.__model=True
+        for par in self.__parameters:
+            par.resetToModel()
 
     def setParameterValue(self, key:str, value):
         for par in self.__parameters:
@@ -146,12 +155,15 @@ class Operation:
 
     def data(self) -> str:
         buffer = "["
+        flag = False
         for i in range(0, len(self.__parameters)):
             par = self.__parameters[i]
             if par.valorized:
-                if i > 0 and i < (len(self.__parameters)-1):
+                if flag:
+                    flag = False
                     buffer += ','
                 buffer += '{' + par.data() + '}'
+                flag = True
         buffer += "]"
         return buffer
 
@@ -183,7 +195,8 @@ class OPERATIONS(Enum):
 
     SUM = 3, Operation('sum', [
         Parameter[str]('uri', True, str),
-        Parameter[str]('columns', False, str)
+        Parameter[str]('columns', False, str),
+        Parameter[str]('rows', False, str)
     ])
 
     MUL = 4, Operation('mul', [

@@ -20,7 +20,7 @@ def route(packet: Packet, dispatcher, fhe: FHE) -> Union[ERRORS, bytes]:
     data = b''
     match index:
         case OPERATIONS.LOAD.value:
-            err = loader_wrapper.load(packet.toOperation(), dispatcher, fhe)
+            err, data = loader_wrapper.load(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.UNLOAD.value:
             err = loader_wrapper.unload(packet.toOperation(), dispatcher, fhe)
         case OPERATIONS.SUM.value:

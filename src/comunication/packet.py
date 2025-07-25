@@ -58,6 +58,9 @@ class Packet:
         if self.__status is not errors.ERRORS.OK.value:
             self.__valid = False
             self.__msg = errors.getMessageErrorByIndex(self.__status)
+            if len(self.data) > 0:
+                self.__msg += f'. {self.__data}'
+
         
     
     @property

@@ -13,6 +13,8 @@ sys.path.append('../../')
 from comunication.operations import Operation, OPERATIONS 
 from comunication.errors import ERRORS
 
+from exception import command_exception
+
 sys.path.append('../../../utils')
 from utils import path_utils, dataset_utils
 
@@ -30,9 +32,11 @@ def load(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
         return ERRORS.DATASET_ALREADY_LOADED
     try:
         dispatcher.data = createDataset(op, fhe)
-        return ERRORS.OK
+        return ERRORS.OK, ''
     except FileExistsError as e:
-        return ERRORS.DATASET_NOTFOUND
+        return ERRORS.DATASET_NOTFOUND, ''
+    except command_exception.CommandException as e:
+        return ERRORS.PARAMETER_ERROR, str(e)
     
 def createDataset(op: Operation, fhe: FHE, reciprocal=False):
     uri = op.getParameterValue('uri')
@@ -49,7 +53,9 @@ def createDataset(op: Operation, fhe: FHE, reciprocal=False):
         logger.warn("It seems like " + uri + " is an empty dataset")
     else:
         logger.info(str(l) + " row(s) read")
-    return dataset
+    if len(rows) <= 0:
+        rows = range(0, l)
+    return dataset, rows
     
 def unload(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     if dispatcher.data is None:

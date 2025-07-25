@@ -29,6 +29,7 @@ class Producer:
         cmd_name = splitted_cmd[0]    #Command Name
         try:
             op_enum = operations.getOperationByName(cmd_name)
+            op_enum.operation.resetToModel()
             op = op_enum.operation.__copy__()
             op.storeParameters(splitted_cmd) #Store parameters
         except Exception as e:
