@@ -20,6 +20,7 @@ sys.path.append('../../../dataset')
 from dataset.dataset import Dataset
 from dataset import datasets
 
+from exception import command_exception
 
 def getNameAndFormatByPath(path: str):
     splitted_uri = path.split('.')
@@ -27,12 +28,16 @@ def getNameAndFormatByPath(path: str):
 
 def load(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     if dispatcher.data is not None:
-        return ERRORS.DATASET_ALREADY_LOADED
+        return ERRORS.DATASET_ALREADY_LOADED, ''
     try:
         dispatcher.data = createDataset(op.getParameterValue('uri'), fhe)
-        return ERRORS.OK
+        return ERRORS.OK, ''
     except FileExistsError as e:
-        return ERRORS.DATASET_NOTFOUND
+        return ERRORS.DATASET_NOTFOUND, ''
+    except ValueError as e:
+        return ERRORS.DATASET_CORRUPTED, str(e)
+    except command_exception.CommandException as e:
+        return ERRORS.PARAMETER_VALUE_ERROR, str(e)
     
 def createDataset(uri: str, fhe: FHE, reciprocal=False):
     logger.info("Loading " + uri + " dataset")

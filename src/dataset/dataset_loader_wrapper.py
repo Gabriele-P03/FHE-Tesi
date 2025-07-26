@@ -29,17 +29,17 @@ def load_csv(stream, fhe: FHE, separator = ';', reciprocal=False):
     data = []
     cc = fhe.cc
     pk = fhe.publicKey
-    #row_index = 0
+    row_index = 0
     #ps = pre = psutil.Process()
     #dt = datetime.datetime.now()
     #ws.append([str(dt)])
     for line in stream:
         #pre = ps.memory_info().rss
-        #row_index += 1
+        row_index += 1
         #Parsing single line
         values = line.split(separator)#Splitting values
         ciphertexts = []
-        #print(str(row_index))
+        print(str(row_index))
         for i in range(len(values)):
             f = []
             try:
@@ -49,7 +49,7 @@ def load_csv(stream, fhe: FHE, separator = ';', reciprocal=False):
                 x = truncate(x)
                 f.append(x)
             except ValueError as e:
-                logger.err('Row ' + str(row_index) + " Col " + columns[i].name + " has an invalid value: " + str(values[i]) )
+                raise ValueError(f'Row {str(row_index)} Col {columns[i].name} has an invalid value: {str(values[i])}')
 
             pltxt = cc.MakeCKKSPackedPlaintext(f)
             enc = cc.Encrypt(pk, pltxt)

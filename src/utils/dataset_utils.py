@@ -24,4 +24,4 @@ def match_indices_cols(cols1, cols2, dataset):
 
         if not flag:
             raise dataset_exception.DatasetException(f'It seems like loaded dataset does not contain {c2} column')
-    return 
+    return indices

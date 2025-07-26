@@ -23,6 +23,12 @@ from exception.command_exception import CommandException
 from exception.dataset_exception import DatasetException
 
 
+import psutil
+from openpyxl import Workbook
+import datetime
+wb = Workbook()
+ws = wb.active
+
 def mul(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     if dispatcher.data is None:
         return ERRORS.NO_DATASET_LOADED
@@ -46,13 +52,25 @@ def mul(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
         
         loaded_dataset = dispatcher.data.data
         loaded_row_size = dispatcher.data.size
+
+        ps = pre = psutil.Process()
+        dt = datetime.datetime.now()
+        ws.append([str(dt)])
+        row_index = 0
+
         for j in ext_indeces:
+            pre = ps.memory_info().rss
+            row_index += 1
+            print(f'Mul {row_index}')
             #j is the col in loaded dataset
             for i1 in range(0,loaded_row_size):
                 c = loaded_dataset[i1][j]
                 c1 = dataset.data[i1][ext_indeces[j]]
                 c = fhe.cc.EvalMultNoRelin(c, c1)
                 loaded_dataset[i1][j] = c
+            ws.append([row_index, pre, ps.memory_info().rss])
+        file_name = 'test_'+str(datetime.datetime.now())+'_'
+        wb.save('/home/gabrielepace_std/FHE-Tesi/test/'+file_name+'.xlsx')
         
         return ERRORS.OK
     except DatasetException as e:
