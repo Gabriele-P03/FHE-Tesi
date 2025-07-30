@@ -39,7 +39,7 @@ def std(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     if dispatcher.data is None:
         return ERRORS.NO_DATASET_LOADED
     try:
-        dataset = dispatcher.data.data
+        dataset = dispatcher.data
         row_size = dispatcher.data.size
         row_size_cpt = fhe.cc.Encrypt(fhe.publicKey, fhe.cc.MakeCKKSPackedPlaintext([1/row_size])) #Row size as ciphertext
 
@@ -55,7 +55,9 @@ def std(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
         except DatasetException as e:
             return ERRORS.DATASET_COLUMN_NOT_PRESENT, str(e)
 
+        js = {}
         buffer = [] #This array will contain deviation standard
+        dataset = dataset.data
 
         for j in ext_indeces:
             #j is the col in loaded dataset, therefore it is going to calculate std for each column
@@ -85,8 +87,11 @@ def std(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
             std = math.sqrt(dev)
             buffer.append(std)
         
-        return ERRORS.OK, json.dumps([buffer])
+        js["columns"] = cols
+        js["data"] = [buffer]
+        
+        return ERRORS.OK, json.dumps(js)
     except DatasetException as e:
         return ERRORS.DATASET_COLUMN_NOT_PRESENT
-    except FileExistsError as e:
+    except FileNotFoundError as e:
         return ERRORS.DATASET_NOTFOUND

@@ -91,5 +91,5 @@ def delete(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
         return ERRORS.OK, ''
     except DatasetException as e:
         return ERRORS.DATASET_COLUMN_NOT_PRESENT, ''
-    except FileExistsError as e:
+    except FileNotFoundError as e:
         return ERRORS.DATASET_NOTFOUND, ''

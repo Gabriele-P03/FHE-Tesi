@@ -32,7 +32,7 @@ def load(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     try:
         dispatcher.data = createDataset(op.getParameterValue('uri'), fhe)
         return ERRORS.OK, ''
-    except FileExistsError as e:
+    except FileNotFoundError as e:
         return ERRORS.DATASET_NOTFOUND, ''
     except ValueError as e:
         return ERRORS.DATASET_CORRUPTED, str(e)

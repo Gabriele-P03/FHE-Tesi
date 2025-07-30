@@ -30,7 +30,7 @@ def avg(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
     if dispatcher.data is None:
         return ERRORS.NO_DATASET_LOADED
     try:
-        dataset = dispatcher.data.data
+        dataset = dispatcher.data
         row_size = dispatcher.data.size
 
         columns = [x.name for x in dispatcher.data.columns]
@@ -45,6 +45,8 @@ def avg(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
         except DatasetException as e:
             return ERRORS.DATASET_COLUMN_NOT_PRESENT, str(e)
 
+        dataset = dataset.data
+        js = {}
         buffer = []
 
         for j in ext_indeces:
@@ -60,9 +62,12 @@ def avg(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
             sum = fhe.cc.Decrypt(fhe.secretKey, ciphertext_buffer).GetCKKSPackedValue()[0].real
             avg = sum/row_size
             buffer.append(avg)
+
+        js["columns"] = cols
+        js["data"] = [buffer]
         
-        return ERRORS.OK, json.dumps([buffer])
+        return ERRORS.OK, json.dumps(js)
     except DatasetException as e:
         return ERRORS.DATASET_COLUMN_NOT_PRESENT
-    except FileExistsError as e:
+    except FileNotFoundError as e:
         return ERRORS.DATASET_NOTFOUND

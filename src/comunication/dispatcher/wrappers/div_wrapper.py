@@ -63,6 +63,9 @@ def div(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
         row_index = 0
 
         for j in ext_indeces:
+            pre = ps.memory_info().rss
+            row_index += 1
+            print(f'Div {row_index}')
             #j is the col in loaded dataset
             for i1 in range(0,loaded_row_size):
                 c = loaded_dataset[i1][j]
@@ -70,12 +73,12 @@ def div(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
                 c = fhe.cc.EvalMultNoRelin(c, c1)
                 loaded_dataset[i1][j] = c
             
-            ws.append([row_index, pre, ps.memory_info().rss])
+            ws.append([row_index, pre, str(ps.memory_info().rss)])
         file_name = 'test_'+str(datetime.datetime.now())+'_'
-        wb.save('/home/gabrielepace_std/FHE-Tesi/test/'+file_name+'.xlsx')
+        wb.save('/home/gabrielepace_std/FHE-Tesi/test/div_'+file_name+'.xlsx')
         
         return ERRORS.OK
     except DatasetException as e:
         return ERRORS.DATASET_COLUMN_NOT_PRESENT
-    except FileExistsError as e:
+    except FileNotFoundError as e:
         return ERRORS.DATASET_NOTFOUND

@@ -72,9 +72,9 @@ def sum(op: Operation, dispatcher: Dispatcher, fhe: FHE) -> ERRORS:
                 loaded_dataset[i1][j] = c
             ws.append([row_index, pre, ps.memory_info().rss])
         file_name = 'test_'+str(datetime.datetime.now())+'_'
-        wb.save('/home/gabrielepace_std/FHE-Tesi/test/'+file_name+'.xlsx')
+        wb.save('/home/gabrielepace_std/FHE-Tesi/test/sum_'+file_name+'.xlsx')
         return ERRORS.OK, ''
     except DatasetException as e:
         return ERRORS.DATASET_COLUMN_NOT_PRESENT, ''
-    except FileExistsError as e:
+    except FileNotFoundError as e:
         return ERRORS.DATASET_NOTFOUND, ''
